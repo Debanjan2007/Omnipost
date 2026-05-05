@@ -1,1 +1,51 @@
 @import "tailwindcss";
+
+@theme {
+    /* 🟣 PRIMARY BRAND */
+    --color-primary: #8467D7;
+    --color-primary-light: #9D8DF2;
+    --color-primary-dark: #5D3FD3;
+
+    /* 🌫 BACKGROUND SYSTEM */
+    --color-background: #F6F1F4;
+    --color-background-soft: #F4F3F8;
+    --color-background-muted: #E6E1F4;
+
+    /* ⚪ NEUTRALS */
+    --color-neutral-100: #FFFFFF;
+    --color-neutral-200: #F4F3F8;
+    --color-neutral-300: #E6E1F4;
+    --color-neutral-400: #B0B0C3;
+    --color-neutral-500: #778899;
+
+    /* 🧠 TEXT */
+    --color-text-primary: #4A5A6D;
+    --color-text-secondary: #778899;
+    --color-text-heading: #1F2937;
+    --color-text-inverse: #FFFFFF;
+
+    /* ⚙️ FUNCTIONAL */
+    --color-success: #22C55E;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+    --color-info: #3B82F6;
+
+    /* 📊 DATA COLORS */
+    --color-data-blue: #3F51B5;
+    --color-data-magenta: #D81B60;
+    --color-data-orange: #FB8C00;
+    --color-data-purple: #8E24AA;
+    --color-data-teal: #00897B;
+    --color-data-violet: #6A5ACD;
+
+    /* 🌈 GRADIENT */
+    --gradient-primary: linear-gradient(135deg, #8467D7, #9D8DF2);
+
+    /* ✨ SHADOWS */
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.04);
+
+    /* 🟦 RADIUS */
+    --radius-xl: 14px;
+    --radius-2xl: 18px;
+}
