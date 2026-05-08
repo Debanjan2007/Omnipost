@@ -1,4 +1,6 @@
 import { LogosSvg as Logos } from '../../../assets/logos-svg.jsx'
+import { useNavigate } from "react-router-dom";
+
 const channels = [
     {
         id: 1,
@@ -18,6 +20,7 @@ const channels = [
 ];
 
 export default function ActiveChannelsCard() {
+    const navigate = useNavigate();
     return (
         <div className="bg-background-soft border border-neutral-300 rounded-2xl p-5 shadow-card">
 
@@ -47,7 +50,9 @@ export default function ActiveChannelsCard() {
             </div>
 
             {/* CTA */}
-            <button className="w-full bg-primary hover:bg-primary-dark text-white text-sm font-medium py-3 rounded-xl transition">
+            <button
+                onClick={() => navigate('/accounts')}
+                className="w-full bg-primary hover:bg-primary-dark text-white text-sm font-medium py-3 rounded-xl transition">
                 Connect a new Channel
             </button>
 
