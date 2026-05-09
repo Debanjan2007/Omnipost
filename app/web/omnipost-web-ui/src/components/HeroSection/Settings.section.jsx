@@ -8,6 +8,7 @@ export default function SettingsPage() {
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
+        profileImage: "",
     });
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const handleChange = (e) => {
@@ -35,41 +36,66 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
 
                 {/* 👤 Profile Card */}
+                {/* 👤 Profile Card */}
                 <div className="bg-background-soft border border-neutral-300 rounded-2xl p-6 shadow-card">
 
                     <div className="flex flex-col items-center text-center">
 
-                        {/* Avatar */}
+                        {/* 👤 Hidden File Input */}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            id="profile-upload"
+                            className="hidden"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+
+                                if (!file) return;
+
+                                const imageUrl = URL.createObjectURL(file);
+
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    profileImage: imageUrl,
+                                }));
+                            }}
+                        />
+
+                        {/* 👤 Avatar */}
                         <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md mb-4">
 
-                            {/* Replace with dynamic user image */}
                             <img
-                                src="https://i.pravatar.cc/200"
+                                src={
+                                    formData.profileImage ||
+                                    "https://i.pravatar.cc/200"
+                                }
                                 alt="User"
                                 className="w-full h-full object-cover"
                             />
 
                         </div>
 
-                        {/* Name */}
+                        {/* 👤 Name */}
                         <h2 className="text-lg font-semibold text-text-heading">
                             {formData.fullName}
                         </h2>
 
-                        {/* Email */}
+                        {/* 📧 Email */}
                         <p className="text-sm text-text-secondary mt-1">
                             {formData.email}
                         </p>
 
-                        {/* Upload */}
-                        <button className="mt-5 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-4 py-2 rounded-xl transition">
+                        {/* 📤 Upload Button */}
+                        <label
+                            htmlFor="profile-upload"
+                            className="mt-5 bg-primary hover:bg-primary-dark text-white text-sm font-medium px-4 py-2 rounded-xl transition cursor-pointer inline-flex items-center justify-center"
+                        >
                             Change Profile Photo
-                        </button>
+                        </label>
 
                     </div>
 
                 </div>
-
                 {/* 🔐 Settings Panel */}
                 <div className="xl:col-span-2 space-y-6">
 
