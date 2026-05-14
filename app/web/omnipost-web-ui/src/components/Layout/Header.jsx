@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef();
 
@@ -30,7 +32,9 @@ export default function Header() {
                 </div>
 
                 {/* Username (hidden on mobile) */}
-                <span className="hidden md:block text-sm font-medium text-text-primary">
+                <span
+                    onClick={() => navigate('userinfo')}
+                    className="hidden cursor-pointer md:block text-sm font-medium text-text-primary">
           Debanjan
         </span>
 

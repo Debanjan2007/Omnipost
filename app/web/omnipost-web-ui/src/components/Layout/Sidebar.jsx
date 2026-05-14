@@ -1,8 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { Icons as icons } from "../../assets/icons-svg.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar() {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
 
 
@@ -53,7 +55,7 @@ export default function Sidebar() {
         ${open ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
             >
                 {/* 🔷 Logo */}
-                <div className="flex items-center gap-3 mb-8 px-2">
+                <div className="flex items-center cursor-pointer gap-3 mb-8 px-2">
                     <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
                         <img src="/logo.png" className="w-5 h-5" />
                     </div>
@@ -103,7 +105,10 @@ export default function Sidebar() {
                             D
                         </div>
 
-                        <div>
+                        <div
+                            onClick={() => navigate('userinfo')}
+                            className="cursor-pointer"
+                        >
                             <p className="text-sm font-medium">Debanjan</p>
                             <p className="text-xs text-white/60">View Profile</p>
                         </div>
