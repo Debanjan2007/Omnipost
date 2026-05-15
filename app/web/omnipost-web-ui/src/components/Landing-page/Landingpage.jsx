@@ -51,7 +51,7 @@ export default function LandingPage() {
                     </button>
 
                     <Link
-                        to="/user/dashboard"
+                        to="/login"
                         className="bg-primary hover:bg-primary-dark text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-sm font-medium transition shadow-md whitespace-nowrap"
                     >
                         Start Free Trial
@@ -93,7 +93,7 @@ export default function LandingPage() {
                         <div className="flex flex-wrap items-center gap-4 sm:gap-5 mt-8 sm:mt-10">
 
                             <Link
-                                to="/user/dashboard"
+                                to="/login"
                                 className="bg-primary hover:bg-primary-dark text-white px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-base sm:text-lg font-medium transition shadow-lg"
                             >
                                 Get Started Free
