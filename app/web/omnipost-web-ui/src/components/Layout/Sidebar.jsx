@@ -9,11 +9,11 @@ export default function Sidebar() {
 
 
     const navItems = [
-        { name: "Dashboard", path: "/dashboard" },
-        { name: "Create_Post", path: "/create" },
-        { name: "Connected_Accounts", path: "/accounts" },
-        { name: "History", path: "/history" },
-        { name: "Settings", path: "/settings" },
+        { name: "Dashboard", path: "/user/dashboard" },
+        { name: "Create_Post", path: "/user/create" },
+        { name: "Connected_Accounts", path: "/user/accounts" },
+        { name: "History", path: "/user/history" },
+        { name: "Settings", path: "/user/settings" },
     ];
 
     return (
