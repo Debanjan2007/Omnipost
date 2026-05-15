@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef();
@@ -18,7 +18,18 @@ export default function Header() {
     }, []);
 
     return (
-        <header className="w-full h-12 md:h-16 bg-background border-b border-neutral-300 flex items-center justify-end px-4 md:px-6">
+        <header className="w-full h-12 md:h-16 bg-background border-b border-neutral-300 flex items-center justify-between px-4 md:px-6">
+
+            {/* 🍔 Hamburger (mobile only) */}
+            <button
+                className="md:hidden p-1 text-text-primary"
+                onClick={onMenuClick}
+                aria-label="Open menu"
+            >
+                <svg viewBox="0 0 24 24" className="w-6 h-6 stroke-current" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
 
             {/* 👤 User Section */}
             <div

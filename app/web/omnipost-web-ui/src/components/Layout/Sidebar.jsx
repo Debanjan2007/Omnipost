@@ -1,11 +1,9 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
 import { Icons as icons } from "../../assets/icons-svg.jsx";
 import { useNavigate } from "react-router-dom";
 
-export default function Sidebar() {
+export default function Sidebar({ open, setOpen }) {
     const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
 
 
     const navItems = [
@@ -18,29 +16,6 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* 📱 Mobile Top Bar */}
-            <div className="md:hidden flex items-center justify-end px-4 h-12 bg-primary-dark text-white">
-
-                {/* Optional: tiny logo on left (remove if you want ultra-clean) */}
-                {/*
-  <img src="/logo.png" className="w-5 h-5 mr-auto" />
-  */}
-
-                {/* Hamburger */}
-                <button onClick={() => setOpen(true)}>
-                    <svg
-                        viewBox="0 0 24 24"
-                        className="w-6 h-6 stroke-current"
-                        fill="none"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
-            </div>
-
             {/* Overlay */}
             {open && (
                 <div
