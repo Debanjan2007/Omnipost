@@ -27,29 +27,33 @@ export default function LandingPage() {
 
                 {/* Nav Links */}
                 <div className="hidden lg:flex items-center gap-12">
+                    <Link to='/solution'>
+                        <button className="text-text-primary hover:text-primary transition font-medium">
+                            Solutions
+                        </button>
+                    </Link>
+                    <Link to='/features'>
 
-                    <button className="text-text-primary hover:text-primary transition font-medium">
-                        Solutions
-                    </button>
-
-                    <button className="text-text-primary hover:text-primary transition font-medium">
-                        Features
-                    </button>
-
-                    <button className="text-text-primary hover:text-primary transition font-medium">
-                        Pricing
-                    </button>
+                        <button className="text-text-primary hover:text-primary transition font-medium">
+                            Features
+                        </button>
+                    </Link>
+                    <Link to='/pricing'>
+                        <button className="text-text-primary hover:text-primary transition font-medium">
+                            Pricing
+                        </button>
+                    </Link>
 
                 </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-3">
-                <Link to='/login'>
-                    <button
-                        className="hidden md:flex border border-neutral-400 hover:border-primary text-text-primary hover:text-primary transition px-5 py-2.5 rounded-2xl text-sm font-medium">
-                        Log In
-                    </button>
-                </Link>
+                    <Link to='/login'>
+                        <button
+                            className="hidden md:flex border border-neutral-400 hover:border-primary text-text-primary hover:text-primary transition px-5 py-2.5 rounded-2xl text-sm font-medium">
+                            Log In
+                        </button>
+                    </Link>
 
                     <Link
                         to="/signup"
