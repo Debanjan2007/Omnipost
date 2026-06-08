@@ -1,66 +1,107 @@
 @import "tailwindcss";
 
-/* ─── OmniPost Design System Tokens ─────────────────────────────────────── */
+/* 🌊 Floating Animations */
+@keyframes floatSlow {
+    0% {
+        transform: translateY(0px) rotate(18deg);
+    }
+
+    50% {
+        transform: translateY(-14px) rotate(18deg);
+    }
+
+    100% {
+        transform: translateY(0px) rotate(18deg);
+    }
+}
+@keyframes floatMedium {
+    0% {
+        transform: translateY(0px) rotate(-12deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(-12deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(-12deg);
+    }
+}
+@keyframes floatFast {
+    0% {
+        transform: translateY(0px) rotate(8deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(8deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(8deg);
+    }
+}
+.animate-float-slow {
+    animation: floatSlow 6s ease-in-out infinite;
+}
+.animate-float-medium {
+    animation: floatMedium 4.5s ease-in-out infinite;
+}
+.animate-float-fast {
+    animation: floatFast 3.5s ease-in-out infinite;
+}
+
 @theme {
-  /* Colors */
-  --color-background: #09090b;
-  --color-surface: #111111;
-  --color-border: #27272a;
-  --color-primary: #3b82f6;
-  --color-secondary: #8b5cf6;
-  --color-text: #fafafa;
-  --color-muted: #a1a1aa;
+    /* 🟣 PRIMARY BRAND */
+    --color-primary: #8467D7;
+    --color-primary-light: #9D8DF2;
+    --color-primary-dark: #5D3FD3;
 
-  /* Brand gradient */
-  --color-brand-start: #6366f1;
-  --color-brand-end: #8b5cf6;
+    /* 🌫 BACKGROUND SYSTEM */
+    --color-background: #F6F1F4;
+    --color-background-soft: #F4F3F8;
+    --color-background-muted: #E6E1F4;
 
-  /* Typography */
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    /* ⚪ NEUTRALS */
+    --color-neutral-100: #FFFFFF;
+    --color-neutral-200: #F4F3F8;
+    --color-neutral-300: #E6E1F4;
+    --color-neutral-400: #B0B0C3;
+    --color-neutral-500: #778899;
 
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+    /* 🧠 TEXT */
+    --color-text-primary: #4A5A6D;
+    --color-text-secondary: #778899;
+    --color-text-heading: #1F2937;
+    --color-text-inverse: #FFFFFF;
+
+    /* ⚙️ FUNCTIONAL */
+    --color-success: #22C55E;
+    --color-error: #EF4444;
+    --color-warning: #F59E0B;
+    --color-info: #3B82F6;
+
+    /* 📊 DATA COLORS */
+    --color-data-blue: #3F51B5;
+    --color-data-magenta: #D81B60;
+    --color-data-orange: #FB8C00;
+    --color-data-purple: #8E24AA;
+    --color-data-teal: #00897B;
+    --color-data-violet: #6A5ACD;
+
+    /* 🌈 GRADIENT */
+    --gradient-primary: linear-gradient(135deg, #8467D7, #9D8DF2);
+
+    /* ✨ SHADOWS */
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.04);
+
+    /* 🟦 RADIUS */
+    --radius-xl: 14px;
+    --radius-2xl: 18px;
 }
 
-/* ─── Global Reset ───────────────────────────────────────────────────────── */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Hide vertical scrollbar but keep scroll working */
+.hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
 }
 
-html {
-  font-family: var(--font-sans);
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  scroll-behavior: smooth;
-  color-scheme: dark;
-}
-
-body {
-  background-color: var(--color-background);
-  color: var(--color-text);
-  min-height: 100svh;
-  overflow-x: hidden;
-}
-
-#root {
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-/* ─── Focus Ring ─────────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: 4px;
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
 }
