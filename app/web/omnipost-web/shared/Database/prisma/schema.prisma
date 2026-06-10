@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Gender {
+  Male
+  Female
+  Others
+}
+
+enum PostType {
+  Video
+  Image
+}
+
+enum SocialMedia {
+  instagram
+  facebook
+  x
+  linkedin
+}
+
+enum Status {
+  pending
+  posted
+  failed
+}
+
+model User {
+  id           Int        @id @unique @default(autoincrement())
+  email        String     @unique
+  name         String
+  avatar       String
+  gender       Gender
+  dob          DateTime
+  refreshToken String
+  accounts     Accounts[]
+  posts        Post[]
+}
+
+model Accounts {
+  id                String   @id @unique
+  userID            Int
+  user              User     @relation(fields: [userID], references: [id])
+  provider          String
+  providerAccountId String
+  accessToken       String
+  refreshToken      String
+  expiresAt         DateTime
+}
+
+model Post {
+  id           String        @id @unique
+  userId       Int
+  user         User          @relation(fields: [userId], references: [id])
+  content      String
+  createdAt    DateTime
+  media        Media[]
+  platformJobs PlatformJob[]
+}
+
+model Media {
+  id       String   @id @unique
+  postId   String
+  post     Post     @relation(fields: [postId], references: [id])
+  url      String
+  posttype PostType
+}
+
+model PlatformJob {
+  id       String      @id @unique
+  postId   String
+  post     Post        @relation(fields: [postId], references: [id])
+  platform SocialMedia
+  status   Status
+}
