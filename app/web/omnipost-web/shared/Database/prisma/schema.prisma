@@ -22,17 +22,20 @@ enum PostType {
   Video
   Image
 }
+
 enum SocialMedia {
   instagram
   facebook
   x
   linkedin
 }
-enum Status{
+
+enum Status {
   pending
   posted
   failed
 }
+
 model User {
   id           Int        @id @unique @default(autoincrement())
   email        String     @unique
@@ -75,9 +78,9 @@ model Media {
 }
 
 model PlatformJob {
-  id     String @id @unique
-  postId String
-  post   Post   @relation(fields: [postId], references: [id])
+  id       String      @id @unique
+  postId   String
+  post     Post        @relation(fields: [postId], references: [id])
   platform SocialMedia
-  status Status
+  status   Status
 }
