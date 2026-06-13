@@ -40,16 +40,20 @@ model User {
   id           Int        @id @unique @default(autoincrement())
   email        String     @unique
   name         String
-  avatar       String
+  avatar       String?
   gender       Gender
-  dob          DateTime
+  dob          DateTime?
+  countryCode  String?
+  phoneNumber  Int?
   refreshToken String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   accounts     Accounts[]
   posts        Post[]
 }
 
 model Accounts {
-  id                String   @id @unique
+  id                String   @id @unique @default(uuid(4))
   userID            Int
   user              User     @relation(fields: [userID], references: [id])
   provider          String
@@ -57,30 +61,34 @@ model Accounts {
   accessToken       String
   refreshToken      String
   expiresAt         DateTime
+  createdDat        DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model Post {
-  id           String        @id @unique
+  id           String        @id @unique @default(uuid(4))
   userId       Int
   user         User          @relation(fields: [userId], references: [id])
   content      String
-  createdAt    DateTime
+  createdAt    DateTime      @default(now())
   media        Media[]
   platformJobs PlatformJob[]
 }
 
 model Media {
-  id       String   @id @unique
-  postId   String
-  post     Post     @relation(fields: [postId], references: [id])
-  url      String
-  posttype PostType
+  id        String   @id @unique @default(uuid(4))
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  url       String
+  posttype  PostType
+  createdAt DateTime @default(now())
 }
 
 model PlatformJob {
-  id       String      @id @unique
-  postId   String
-  post     Post        @relation(fields: [postId], references: [id])
-  platform SocialMedia
-  status   Status
+  id        String      @id @unique @default(uuid(4))
+  postId    String
+  post      Post        @relation(fields: [postId], references: [id])
+  platform  SocialMedia
+  status    Status
+  createdAt DateTime    @default(now())
 }
