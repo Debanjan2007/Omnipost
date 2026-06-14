@@ -24,4 +24,6 @@ const truecallerAuthUrl = (suffix: 'signup' | 'login') => {
     return `${truecallerBaseUrl}?${AuthParams.toString()}`
 }
 
-export default truecallerAuthUrl
+export {
+    truecallerAuthUrl
+}
