@@ -17,3 +17,12 @@ const uniauth = new Uniauth({
         }
     }
 })
+
+const googleProvider: any = uniauth.getProvider('Google')
+const githubProvider: any = uniauth.getProvider('Github')
+
+export {
+    uniauth,
+    googleProvider,
+    githubProvider,
+}
