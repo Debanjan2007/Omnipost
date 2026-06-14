@@ -4,6 +4,6 @@ import { authUrlReturn } from '../controller/auth.controller'
 const router = Router()
 
 // @ts-ignores
-router.get('/signup', authUrlReturn)
+router.get('/authUrl', authUrlReturn)
 
 export default router

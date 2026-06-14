@@ -9,7 +9,15 @@ import {httpurl} from "@deba_1307/uniauth";
 
 const authUrlReturn = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const {auth1, auth2} = req.query
+        const {auth1, auth2 , auth_state} = req.query
+        // @ts-ignore
+        if(auth_state != 'signup' || auth_state != 'signing'){
+            return res
+                .status(400)
+                .json(
+                    new ApiErrHandler(400, null, "Invalid auth state")
+                )
+        }
         if (!req.query || !auth1 || !auth2) {
             return res
                 .status(400)
@@ -29,7 +37,7 @@ const authUrlReturn = asyncHandler(async (req: Request, res: Response) => {
         if (auth2 === process.env.AUTH2) {
             auth2url = githubProvider.getAuthorizationUrl()
         } else {
-            auth2url = truecallerAuthUrl("signup")
+            auth2url = truecallerAuthUrl(auth_state)
         }
         return res
             .status(200)
@@ -50,7 +58,6 @@ const authUrlReturn = asyncHandler(async (req: Request, res: Response) => {
             )
     }
 })
-
 export {
     authUrlReturn
 }
