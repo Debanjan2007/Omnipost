@@ -14,9 +14,12 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@deba_1307/uniauth": "^0.1.50",
+    "cookie-parser": "^1.4.7",
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/pg": "^8.20.0"
   }
 }
