@@ -7,7 +7,7 @@ enum Gender {
 }
 
 interface UserType {
-    id: number,
+    id?: number,
     email: string,
     name: string,
     avatar: string
@@ -20,8 +20,8 @@ interface UserType {
     updatedAt?: Date,
 }
 
-export const User = z.object({
-    id: z.number(),
+const UserSchema = z.object({
+    id: z.number().optional(),
     email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\$/),
     name: z.string(),
     avatar: z.string().regex(/^https?:\/\//),
@@ -33,3 +33,6 @@ export const User = z.object({
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
 }) satisfies z.ZodType<UserType>
+
+type userType = z.infer<typeof UserSchema>
+export type { userType }
