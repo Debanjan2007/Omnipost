@@ -9,7 +9,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
-app.use('/api/v1', router)
+app.use('/api/v1/auth', router)
+// this router is for authorised user routes
 app.use('/api/v1/user' , userRouter)
 // here come other routes
 app.use(globalErrHandler) // last middleware

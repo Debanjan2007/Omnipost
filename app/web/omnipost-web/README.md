@@ -2,6 +2,21 @@
 
 This Turborepo starter is maintained by the Turborepo core team.
 
+## Architecture Planning
+
+This section outlines the high-level architecture of OmniPost's **Post Engine** — the core pipeline responsible for content generation, scheduling, and multi-platform distribution.
+
+![Post Engine Architecture Diagram](../../../../assets/post-engine-architecture-plan.png)
+
+The diagram above captures the planned architecture including:
+
+- **Input Layer** — User intent, content sources, and scheduling triggers
+- **Post Engine Core** — AI-driven content generation, formatting, and adaptation per platform
+- **Distribution Layer** — Platform-specific adapters (Twitter/X, LinkedIn, Instagram, etc.)
+- **Feedback Loop** — Analytics ingestion and post-performance signals fed back into the engine
+
+---
+
 ## Using this example
 
 Run the following command:
