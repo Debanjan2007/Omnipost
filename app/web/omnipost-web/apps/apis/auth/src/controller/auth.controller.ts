@@ -9,9 +9,9 @@ import {httpurl} from "@deba_1307/uniauth";
 
 const authUrlReturn = asyncHandler(async (req: Request, res: Response) => {
     try {
-        const {auth1, auth2 , auth_state} = req.query
-        // @ts-ignore
-        if(auth_state != 'signup' || auth_state != 'signing'){
+        const {auth1, auth2 } = req.query
+        const auth_state : 'signup' | 'login' = req.query?.auth_state as 'signup' | 'login'
+        if(auth_state as string != 'signup' || auth_state as string != 'login'){
             return res
                 .status(400)
                 .json(
@@ -37,7 +37,7 @@ const authUrlReturn = asyncHandler(async (req: Request, res: Response) => {
         if (auth2 === process.env.AUTH2) {
             auth2url = githubProvider.getAuthorizationUrl()
         } else {
-            auth2url = truecallerAuthUrl(auth_state)
+            auth2url = truecallerAuthUrl(auth_state as 'signup' | 'login')
         }
         return res
             .status(200)
