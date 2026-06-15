@@ -1,4 +1,4 @@
-export const asyncHandler = async (requestHandler: unknown) => {
+export const asyncHandler = (requestHandler: unknown) => {
     return (req: unknown, res: unknown, next: unknown) => {
         // @ts-ignore
         Promise.resolve(requestHandler(req, res, next))
