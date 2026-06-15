@@ -3,7 +3,7 @@ import {z} from 'zod'
 enum Gender {
     MALE = 'Male',
     FEMALE = 'Female',
-    OTHER = 'Other',
+    OTHER = 'Others',
 }
 
 interface UserType {
@@ -35,4 +35,4 @@ const UserSchema = z.object({
 }) satisfies z.ZodType<UserType>
 
 type userType = z.infer<typeof UserSchema>
-export type { userType }
+export type { userType , Gender, UserSchema }
