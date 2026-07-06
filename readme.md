@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./app/web/omnipost-web/apps/web/public/logo.png" alt="OmniPost Logo" width="120" />
+  <img src="./app/web/omnipost-web/apps/web/omnipost-web-fullstack/public/logo.png" alt="OmniPost Logo" width="120" />
 </p>
 
 <h1 align="center">OmniPost</h1>
