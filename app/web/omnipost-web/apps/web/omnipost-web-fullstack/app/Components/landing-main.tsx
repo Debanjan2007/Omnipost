@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import {MorphingText} from "@/components/ui/morphing-text"
+import { KineticText } from "@/components/ui/kinetic-text"
 
 export function LandingMain() {
     return (
@@ -24,8 +25,7 @@ export function LandingMain() {
                                     texts={["Unify your social", "Publish Everywhere.", "Grow Your Audience.", "Analyze Performance.", "Collaborate Faster.", "Build Your Brand."]}
                                 />
                                 <br/>
-                                Elevate Your Influence.
-
+                                <KineticText text="Elevate Your Influence." />
                             </h1>
 
                             {/* Subtitle */}
