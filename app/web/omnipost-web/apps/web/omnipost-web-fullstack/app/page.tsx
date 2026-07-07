@@ -6,6 +6,7 @@ import {RippleButton} from "@/components/ui/ripple-button"
 import {InteractiveHoverButton} from "@/components/ui/interactive-hover-button"
 import {AnimatedThemeToggler} from "@/components/ui/animated-theme-toggler"
 import {LandingMain} from "@/app/Components/landing-main";
+import { Footer } from "@/app/Components/Footer";
 
 
 export default function Home() {
@@ -61,6 +62,9 @@ export default function Home() {
             <main>
                 <LandingMain/>
             </main>
+            <footer>
+                <Footer />
+            </footer>
         </div>
     );
 }
