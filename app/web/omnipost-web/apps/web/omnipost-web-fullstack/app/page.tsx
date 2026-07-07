@@ -10,7 +10,7 @@ import {LandingMain} from "@/app/Components/landing-main";
 
 export default function Home() {
     return (
-        <div className="landing-page h-screen w-screen overflow-hidden">
+        <div className="landing-page h-screen w-screen overflow-x-hidden">
             <nav className="relative z-50">
 
                 <div
