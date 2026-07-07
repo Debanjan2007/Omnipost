@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {Geist_Mono, Poppins} from "next/font/google";
 import "./globals.css";
+import {ClerkProvider} from '@clerk/nextjs'
 
 const poppins = Poppins({
     variable: "--font-poppins",
@@ -29,7 +30,9 @@ export default function RootLayout({
             className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
         >
         <body className="font-sans min-h-full flex flex-col">
-        {children}
+        <ClerkProvider>
+            {children}
+        </ClerkProvider>
         </body>
         </html>
     );
