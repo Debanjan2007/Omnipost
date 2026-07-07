@@ -4,6 +4,7 @@ import Link from "next/link"
 import {MorphingText} from "@/components/ui/morphing-text"
 import { KineticText } from "@/components/ui/kinetic-text"
 import { AnimatedBeamContainer } from "./AnimatedBeam"
+import { FAQSection } from "./FaqSection"
 
 export function LandingMain() {
     return (
@@ -242,8 +243,11 @@ export function LandingMain() {
                     </div>
 
                 </div>
-                <div className="w-full min-h-screen flex items-center justify-center">
+                <div className="w-full flex mt-22 py-6 items-center justify-center">
                     <AnimatedBeamContainer />
+                </div>
+                <div className="w-full mt-6 py-6 flex items-center justify-center">
+                    <FAQSection />
                 </div>
             </section>
         </>
