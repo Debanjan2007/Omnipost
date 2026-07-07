@@ -1,17 +1,20 @@
+"use client"
 import Image from "next/image";
 import {MobileNav} from "./Components/Mobile-nav"
 import Link from "next/link";
 import {RippleButton} from "@/components/ui/ripple-button"
 import {InteractiveHoverButton} from "@/components/ui/interactive-hover-button"
 import {AnimatedThemeToggler} from "@/components/ui/animated-theme-toggler"
+import {LandingMain} from "@/app/Components/landing-main";
 
 
 export default function Home() {
     return (
-        <div className="landing-page h-screen w-screen">
-            <nav>
+        <div className="landing-page h-screen w-screen overflow-hidden">
+            <nav className="relative z-50">
+
                 <div
-                    className="hidden layout-header md:p-8 lg:px-16 md:flex items-center justify-between  md:h-18.5 lg:h-21 w-screen">
+                    className="hidden layout-header md:p-8 lg:px-16 md:flex items-center justify-between z-10 md:h-18.5 lg:h-21 w-screen">
                     <div className="logo flex items-center gap-2.5 cursor-pointer">
                         <Image src="/logo.png" alt="omnipost-logo" width={44} height={44}/>
                         <span className="text-2xl font-bold">OmniPost</span>
@@ -55,6 +58,9 @@ export default function Home() {
                     <MobileNav/>
                 </div>
             </nav>
+            <main>
+                <LandingMain/>
+            </main>
         </div>
     );
 }
