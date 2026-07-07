@@ -82,7 +82,28 @@
             opacity: 0;
         }
     }
-}
+    --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+    --color-color-5: var(--color-5);
+    --color-color-4: var(--color-4);
+    --color-color-3: var(--color-3);
+    --color-color-2: var(--color-2);
+    --color-color-1: var(--color-1)
+;
+    @keyframes rainbow {
+        0% {
+            background-position: 0%;
+        }
+        100% {
+            background-position: 200%;
+        }
+    }
+    --animate-blink-cursor: blink-cursor 1.2s step-end infinite
+;
+  @keyframes blink-cursor {
+  0%, 49% {
+    opacity: 1;}
+  50%, 100% {
+    opacity: 0;}}}
 
 :root {
     /* Surfaces */
@@ -131,6 +152,11 @@
     --sidebar-accent-foreground: #5D3FD3;
     --sidebar-border: #E6E1F4;
     --sidebar-ring: #8467D7;
+    --color-1: oklch(66.2% 0.225 25.9);
+    --color-2: oklch(60.4% 0.26 302);
+    --color-3: oklch(69.6% 0.165 251);
+    --color-4: oklch(80.2% 0.134 225);
+    --color-5: oklch(90.7% 0.231 133);
 }
 
 .dark {
@@ -191,6 +217,11 @@
 
     --sidebar-border: #313145;
     --sidebar-ring: #9C82F0;
+    --color-1: oklch(66.2% 0.225 25.9);
+    --color-2: oklch(60.4% 0.26 302);
+    --color-3: oklch(69.6% 0.165 251);
+    --color-4: oklch(80.2% 0.134 225);
+    --color-5: oklch(90.7% 0.231 133);
 }
 
 @layer base {
@@ -210,4 +241,55 @@
 ::view-transition-old(root), ::view-transition-new(root) {
     animation: none;
     mix-blend-mode: normal;
+}
+
+/* 🌊 Floating Animations */
+@keyframes floatSlow {
+    0% {
+        transform: translateY(0px) rotate(18deg);
+    }
+
+    50% {
+        transform: translateY(-14px) rotate(18deg);
+    }
+
+    100% {
+        transform: translateY(0px) rotate(18deg);
+    }
+}
+
+@keyframes floatMedium {
+    0% {
+        transform: translateY(0px) rotate(-12deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(-12deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(-12deg);
+    }
+}
+
+@keyframes floatFast {
+    0% {
+        transform: translateY(0px) rotate(8deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(8deg);
+    }
+    100% {
+        transform: translateY(0px) rotate(8deg);
+    }
+}
+
+.animate-float-slow {
+    animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-float-medium {
+    animation: floatMedium 4.5s ease-in-out infinite;
+}
+
+.animate-float-fast {
+    animation: floatFast 3.5s ease-in-out infinite;
 }
