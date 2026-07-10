@@ -1,8 +1,8 @@
-import { SignUp } from '@clerk/nextjs'
+import { SignIn } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function SignUpPage() {
+export default function LoginPage() {
     return (
         <div className="min-h-screen w-full flex">
             {/* Left Panel — Branding */}
@@ -35,39 +35,33 @@ export default function SignUpPage() {
                 {/* Center copy */}
                 <div className="z-10 space-y-6">
                     <h1 className="text-5xl font-bold text-white leading-tight">
-                        Start posting<br />smarter.
+                        Welcome<br />back.
                     </h1>
                     <p className="text-lg text-white/80 max-w-sm leading-relaxed">
-                        Join thousands of creators who use OmniPost to manage their social media presence — all in one dashboard.
+                        One platform for all your social media. Schedule, publish, and analyse — everything in one place.
                     </p>
 
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 gap-4 pt-2">
-                        {[
-                            { value: '10k+', label: 'Active Users' },
-                            { value: '4', label: 'Platforms' },
-                            { value: '99.9%', label: 'Uptime' },
-                            { value: 'Free', label: 'To start' },
-                        ].map((stat) => (
-                            <div
-                                key={stat.label}
-                                className="rounded-xl p-4"
-                                style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)' }}
+                    {/* Feature badges */}
+                    <div className="flex flex-wrap gap-3 pt-2">
+                        {['Instagram', 'LinkedIn', 'X', 'Facebook'].map((platform) => (
+                            <span
+                                key={platform}
+                                className="px-4 py-1.5 rounded-full text-sm font-medium text-white"
+                                style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.25)' }}
                             >
-                                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                                <div className="text-sm text-white/70 mt-0.5">{stat.label}</div>
-                            </div>
+                                {platform}
+                            </span>
                         ))}
                     </div>
                 </div>
 
                 {/* Footer quote */}
                 <p className="z-10 text-white/50 text-sm">
-                    "Your social media, supercharged."
+                    "The easiest way to manage your social presence."
                 </p>
             </div>
 
-            {/* Right Panel — Clerk SignUp */}
+            {/* Right Panel — Clerk SignIn */}
             <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-background">
                 {/* Mobile logo */}
                 <div className="flex items-center gap-2 mb-8 lg:hidden">
@@ -75,7 +69,7 @@ export default function SignUpPage() {
                     <span className="text-xl font-bold">OmniPost</span>
                 </div>
 
-                <SignUp
+                <SignIn
                     appearance={{
                         elements: {
                             rootBox: 'w-full max-w-md',
@@ -98,9 +92,9 @@ export default function SignUpPage() {
                 />
 
                 <p className="mt-6 text-sm text-muted-foreground">
-                    Already have an account?{' '}
-                    <Link href="/login" className="text-primary font-medium hover:underline">
-                        Sign in
+                    Don&apos;t have an account?{' '}
+                    <Link href="/signup" className="text-primary font-medium hover:underline">
+                        Sign up for free
                     </Link>
                 </p>
             </div>
