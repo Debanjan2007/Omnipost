@@ -41,11 +41,12 @@ model User {
   email        String     @unique
   name         String
   avatar       String?
-  gender       Gender
+  gender       Gender?
   dob          DateTime?
   countryCode  String?
   phoneNumber  Int?
-  refreshToken String
+  clerkId      String?    @unique
+  refreshToken String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   accounts     Accounts[]
@@ -59,7 +60,7 @@ model Accounts {
   provider          String
   providerAccountId String
   accessToken       String
-  refreshToken      String
+  refreshToken      String?
   expiresAt         DateTime
   createdDat        DateTime @default(now())
   updatedAt         DateTime @updatedAt
