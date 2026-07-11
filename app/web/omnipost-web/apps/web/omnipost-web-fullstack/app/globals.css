@@ -65,6 +65,16 @@
     --color-data-teal: #00897B;
     --color-data-violet: #6A5ACD;
 
+    /* Social platform brand colors */
+    --color-brand-instagram: #E1306C;
+    --color-brand-facebook: #1877F2;
+    --color-brand-linkedin: #0A66C2;
+    --color-brand-twitter: #1DA1F2;
+    --color-brand-x: #14171A;
+    --color-brand-threads: #101010;
+    --color-brand-bluesky: #0085FF;
+    --color-brand-youtube: #FF0000;
+
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
