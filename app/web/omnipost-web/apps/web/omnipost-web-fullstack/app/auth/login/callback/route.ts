@@ -45,7 +45,6 @@ export async function GET() {
             },
         })
 
-        console.log('[login/callback] User logged in:', user.id, user.email)
 
         // Set httpOnly cookie with accessToken and redirect to dashboard
         const response = NextResponse.redirect(
