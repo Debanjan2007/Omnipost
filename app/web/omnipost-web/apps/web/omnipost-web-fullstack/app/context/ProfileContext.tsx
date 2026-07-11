@@ -2,7 +2,14 @@
 
 import { createContext, useContext, type ReactNode } from "react"
 import { useUser } from "@clerk/nextjs"
-import type { UserResource } from "@clerk/types"
+// Minimal UserResource type to avoid depending on @clerk/types in this file
+type UserResource = {
+    firstName?: string | null
+    lastName?: string | null
+    username?: string | null
+    imageUrl?: string | null
+    primaryEmailAddress?: { emailAddress?: string | null } | null
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
