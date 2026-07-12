@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "./generated/prisma"
 }
 
@@ -105,4 +105,3 @@ model AppearanceSettings {
   animations  Boolean  @default(true)
   updatedAt   DateTime @updatedAt
 }
-
