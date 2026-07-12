@@ -1,0 +1,1 @@
+export { SettingsPageContent } from "./SettingsPageContent"
