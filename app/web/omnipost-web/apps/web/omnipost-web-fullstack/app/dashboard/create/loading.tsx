@@ -1,7 +1,9 @@
-// ─── Skeleton atoms ───────────────────────────────────────────────────────────
+interface SkProps extends React.ComponentPropsWithoutRef<"div"> {
+    className?: string
+}
 
-function Sk({ className }: { className?: string }) {
-    return <div className={`animate-pulse rounded-lg bg-muted/70 ${className ?? ""}`}/>
+function Sk({ className, ...props }: SkProps) {
+    return <div className={`animate-pulse rounded-lg bg-muted/70 ${className ?? ""}`} {...props}/>
 }
 
 function SkCard({ className, children }: { className?: string; children: React.ReactNode }) {

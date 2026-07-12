@@ -12,19 +12,21 @@ interface AppearanceProviderProps {
 export function AppearanceProvider({ children }: AppearanceProviderProps) {
     const { user, isLoaded: isUserLoaded } = useUser()
     const { theme: nextTheme, setTheme: setNextTheme } = useTheme()
-    const initializeStore = useAppearanceStore((state) => state.initialize)
     const storeSettings = useAppearanceStore((state) => state.settings)
 
     // 1. Initial hydration on mount from local storage (extremely fast local cache)
+    // Runs exactly once on mount to prevent infinite loop hydration depth errors.
     useEffect(() => {
         try {
             const cached = localStorage.getItem("appearance-settings")
+            const initializeStore = useAppearanceStore.getState().initialize
+            
             if (cached) {
                 const parsed = JSON.parse(cached) as AppearanceSettings
                 initializeStore(parsed)
                 
                 // Keep next-themes in sync
-                if (parsed.theme && parsed.theme !== nextTheme) {
+                if (parsed.theme) {
                     setNextTheme(parsed.theme)
                 }
             } else {
@@ -35,9 +37,10 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
             }
         } catch (e) {
             console.error("Failed to restore appearance settings cache:", e)
-            initializeStore(DEFAULT_SETTINGS)
+            useAppearanceStore.getState().initialize(DEFAULT_SETTINGS)
         }
-    }, [initializeStore, setNextTheme])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     // 2. Fetch fresh settings from the database in the background when signed in
     useEffect(() => {
@@ -52,11 +55,13 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
                 const dbSettings = await res.json()
                 
                 if (active && dbSettings && Object.keys(dbSettings).length > 0) {
+                    const initializeStore = useAppearanceStore.getState().initialize
+                    
                     // Update store & local storage cache
                     initializeStore(dbSettings)
                     
                     // Sync theme to next-themes
-                    if (dbSettings.theme && dbSettings.theme !== nextTheme) {
+                    if (dbSettings.theme) {
                         setNextTheme(dbSettings.theme)
                     }
                 }
@@ -70,28 +75,24 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
         return () => {
             active = false
         }
-    }, [user, isUserLoaded, initializeStore, setNextTheme])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user, isUserLoaded])
 
-    // 3. Keep root DOM attributes in sync when store settings change (or next-theme resolves)
+    // 3. Keep root DOM attributes in sync when store settings change
     useEffect(() => {
         applyAttributesToDOM(storeSettings)
     }, [storeSettings])
 
-    // 4. Sync next-themes changes back to the store (e.g. if updated via another theme toggle)
-    useEffect(() => {
-        if (nextTheme && nextTheme !== storeSettings.theme) {
-            useAppearanceStore.getState().setSettings({ theme: nextTheme as AppearanceSettings["theme"] })
-        }
-    }, [nextTheme, storeSettings.theme])
-
-    // 5. Cross-tab synchronization via browser 'storage' event
+    // 4. Cross-tab synchronization via browser 'storage' event
     useEffect(() => {
         function handleStorageSync(e: StorageEvent) {
             if (e.key === "appearance-settings" && e.newValue) {
                 try {
                     const parsed = JSON.parse(e.newValue) as AppearanceSettings
+                    const initializeStore = useAppearanceStore.getState().initialize
+                    
                     initializeStore(parsed)
-                    if (parsed.theme && parsed.theme !== nextTheme) {
+                    if (parsed.theme) {
                         setNextTheme(parsed.theme)
                     }
                 } catch (err) {
@@ -102,7 +103,8 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
 
         window.addEventListener("storage", handleStorageSync)
         return () => window.removeEventListener("storage", handleStorageSync)
-    }, [initializeStore, nextTheme, setNextTheme])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     return <>{children}</>
 }

@@ -70,8 +70,6 @@ export function FAQSection() {
                 </div>
 
                 <Accordion
-                    type="single"
-                    collapsible
                     className="w-full rounded-xl border bg-card px-6"
                 >
                     {faqs.map((faq, index) => (

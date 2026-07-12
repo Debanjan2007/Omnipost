@@ -1,6 +1,7 @@
 "use client"
 
 import { useTheme as useNextTheme } from "next-themes"
+import { useAppearanceStore } from "./useAppearanceStore"
 
 export type Theme = "light" | "dark"
 
@@ -11,12 +12,17 @@ export function useTheme() {
     const theme = (resolvedTheme === "dark" ? "dark" : "light") as Theme
     
     function toggleTheme() {
-        setTheme(theme === "dark" ? "light" : "dark")
+        const newTheme = theme === "dark" ? "light" : "dark"
+        setTheme(newTheme)
+        useAppearanceStore.getState().setSettings({ theme: newTheme })
     }
     
     return {
         theme,
         toggleTheme,
-        setTheme: (t: Theme) => setTheme(t),
+        setTheme: (t: Theme) => {
+            setTheme(t)
+            useAppearanceStore.getState().setSettings({ theme: t })
+        },
     }
 }
