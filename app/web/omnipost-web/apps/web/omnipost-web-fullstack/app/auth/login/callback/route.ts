@@ -35,10 +35,12 @@ export async function GET() {
             create: {
                 email,
                 name,
+                clerkId: clerkUser.id,
                 avatar: clerkUser.imageUrl ?? null,
                 refreshToken,
             },
             update: {
+                clerkId: clerkUser.id,
                 refreshToken,
                 // Keep avatar in sync in case they changed their profile picture
                 avatar: clerkUser.imageUrl ?? null,

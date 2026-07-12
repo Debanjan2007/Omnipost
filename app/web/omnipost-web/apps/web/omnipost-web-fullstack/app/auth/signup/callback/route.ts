@@ -34,10 +34,12 @@ export async function GET() {
             create: {
                 email,
                 name,
+                clerkId: clerkUser.id,
                 avatar: clerkUser.imageUrl ?? null,
                 refreshToken,
             },
             update: {
+                clerkId: clerkUser.id,
                 // Keep profile fresh on every signup/re-auth
                 name,
                 avatar: clerkUser.imageUrl ?? null,
