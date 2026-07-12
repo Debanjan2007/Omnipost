@@ -134,7 +134,7 @@ export function Sidebar({ className }: { className?: string }) {
     return (
         <aside
             className={cn(
-                "hidden lg:flex flex-col w-60 xl:w-65 shrink-0 h-screen sticky top-0",
+                "hidden lg:flex flex-col w-[var(--sidebar-width)] shrink-0 h-screen sticky top-0",
                 className
             )}
         >
@@ -142,3 +142,4 @@ export function Sidebar({ className }: { className?: string }) {
         </aside>
     )
 }
+

@@ -37,20 +37,21 @@ enum Status {
 }
 
 model User {
-  id           Int        @id @unique @default(autoincrement())
-  email        String     @unique
-  name         String
-  avatar       String?
-  gender       Gender?
-  dob          DateTime?
-  countryCode  String?
-  phoneNumber  Int?
-  clerkId      String?    @unique
-  refreshToken String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  accounts     Accounts[]
-  posts        Post[]
+  id                 Int                 @id @unique @default(autoincrement())
+  email              String              @unique
+  name               String
+  avatar             String?
+  gender             Gender?
+  dob                DateTime?
+  countryCode        String?
+  phoneNumber        Int?
+  clerkId            String?             @unique
+  refreshToken       String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  accounts           Accounts[]
+  posts              Post[]
+  appearanceSettings AppearanceSettings?
 }
 
 model Accounts {
@@ -93,3 +94,15 @@ model PlatformJob {
   status    Status
   createdAt DateTime    @default(now())
 }
+
+model AppearanceSettings {
+  id          Int      @id @unique @default(autoincrement())
+  userId      Int      @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme       String   @default("system")
+  accentColor String   @default("indigo")
+  density     String   @default("comfortable")
+  animations  Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+

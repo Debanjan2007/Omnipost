@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { SettingsTab } from "./data/settingsData"
 import { SettingsNavigation } from "./sections/SettingsNavigation"
 import { ProfilePanel } from "./panels/ProfilePanel"
@@ -16,19 +16,177 @@ import { IntegrationsPanel } from "./panels/IntegrationsPanel"
 import { BillingPanel } from "./panels/BillingPanel"
 import { AdvancedPanel } from "./panels/AdvancedPanel"
 import { Check, Info } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useAppearance, useAppearanceStore, DEFAULT_SETTINGS, applyAttributesToDOM } from "@/app/context"
+import { useTheme } from "next-themes"
 
 export function SettingsPageContent() {
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile")
+    
+    // Legacy mock state for other settings tabs
     const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-
     const triggerChange = () => {
         setHasUnsavedChanges(true)
     }
 
-    const handleSaveAll = () => {
-        setHasUnsavedChanges(false)
-        alert("All settings configurations saved successfully.")
+    // --- Global Appearance Sync and Lifted Page-Level Draft State ---
+    const { settings, setSettings } = useAppearance()
+    const { setTheme: setNextTheme } = useTheme()
+
+    const [draftTheme, setDraftTheme] = useState<"light" | "dark" | "system">("system")
+    const [draftAccent, setDraftAccent] = useState<"indigo" | "purple" | "blue" | "green" | "pink" | "orange">("indigo")
+    const [draftDensity, setDraftDensity] = useState<"comfortable" | "compact">("comfortable")
+    const [draftAnimations, setDraftAnimations] = useState<boolean>(true)
+
+    // Sync draft with global store changes (e.g. background fetch completion)
+    useEffect(() => {
+        setDraftTheme(settings.theme)
+        setDraftAccent(settings.accentColor)
+        setDraftDensity(settings.density)
+        setDraftAnimations(settings.animations)
+    }, [settings])
+
+    const isAppearanceDirty = 
+        draftTheme !== settings.theme ||
+        draftAccent !== settings.accentColor ||
+        draftDensity !== settings.density ||
+        draftAnimations !== settings.animations
+
+    const pageIsDirty = activeTab === "appearance" ? isAppearanceDirty : hasUnsavedChanges
+
+    // Live Preview Effect: Apply draft values instantly to root HTML element attributes
+    useEffect(() => {
+        if (activeTab !== "appearance") return
+
+        applyAttributesToDOM({
+            theme: draftTheme,
+            accentColor: draftAccent,
+            density: draftDensity,
+            animations: draftAnimations,
+        })
+        setNextTheme(draftTheme)
+    }, [draftTheme, draftAccent, draftDensity, draftAnimations, activeTab, setNextTheme])
+
+    // Cleanup: Reset root attributes to saved settings when leaving/unmounting the settings page
+    useEffect(() => {
+        return () => {
+            const saved = useAppearanceStore.getState().settings
+            applyAttributesToDOM(saved)
+            setNextTheme(saved.theme)
+        }
+    }, [setNextTheme])
+
+    // Warnings: Warn before page reload
+    useEffect(() => {
+        if (!pageIsDirty) return
+
+        function handleBeforeUnload(e: BeforeUnloadEvent) {
+            e.preventDefault()
+            e.returnValue = ""
+        }
+
+        window.addEventListener("beforeunload", handleBeforeUnload)
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+    }, [pageIsDirty])
+
+    // Warnings: Intercept link clicks to warn on client-side routing
+    useEffect(() => {
+        if (!pageIsDirty) return
+
+        function handleLinkClick(e: MouseEvent) {
+            let target = e.target as HTMLElement | null
+            while (target && target !== document.body) {
+                if (target.tagName === "A") {
+                    const href = target.getAttribute("href")
+                    if (href && href.startsWith("/") && !href.startsWith("/dashboard/settings")) {
+                        const leave = window.confirm("You have unsaved changes. Are you sure you want to leave?")
+                        if (!leave) {
+                            e.preventDefault()
+                            e.stopPropagation()
+                        }
+                    }
+                    break
+                }
+                target = target.parentElement
+            }
+        }
+
+        document.addEventListener("click", handleLinkClick, { capture: true })
+        return () => document.removeEventListener("click", handleLinkClick, { capture: true })
+    }, [pageIsDirty])
+
+    const handleSaveAppearance = async () => {
+        try {
+            const body = {
+                theme: draftTheme,
+                accentColor: draftAccent,
+                density: draftDensity,
+                animations: draftAnimations,
+            }
+            const res = await fetch("/api/appearance", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            })
+            if (!res.ok) throw new Error("Save request failed")
+            const savedSettings = await res.json()
+
+            // Update Zustand Store, writing back to local storage cache
+            setSettings(savedSettings)
+            alert("Appearance settings saved successfully.")
+        } catch (err) {
+            console.error("Failed to save appearance settings:", err)
+            alert("Failed to save changes. Please try again.")
+        }
+    }
+
+    const handleDiscard = () => {
+        if (activeTab === "appearance") {
+            setDraftTheme(settings.theme)
+            setDraftAccent(settings.accentColor)
+            setDraftDensity(settings.density)
+            setDraftAnimations(settings.animations)
+            
+            // Re-apply original store values
+            applyAttributesToDOM(settings)
+            setNextTheme(settings.theme)
+        } else {
+            setHasUnsavedChanges(false)
+        }
+    }
+
+    const handleSaveAll = async () => {
+        if (activeTab === "appearance") {
+            await handleSaveAppearance()
+        } else {
+            setHasUnsavedChanges(false)
+            alert("All settings configurations saved successfully.")
+        }
+    }
+
+    const handleResetToDefaults = async () => {
+        try {
+            const res = await fetch("/api/appearance", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(DEFAULT_SETTINGS),
+            })
+            if (!res.ok) throw new Error("Reset request failed")
+            const resetSettings = await res.json()
+
+            // Update store
+            setSettings(resetSettings)
+
+            // Reset local page drafts
+            setDraftTheme(resetSettings.theme)
+            setDraftAccent(resetSettings.accentColor)
+            setDraftDensity(resetSettings.density)
+            setDraftAnimations(resetSettings.animations)
+            
+            alert("Appearance settings reset to default values.")
+        } catch (err) {
+            console.error("Failed to reset appearance settings:", err)
+            alert("Failed to reset settings. Please try again.")
+        }
     }
 
     const renderActivePanel = () => {
@@ -39,7 +197,19 @@ export function SettingsPageContent() {
             case "accounts":      return <ConnectedAccountsPanel />
             case "ai":            return <AIPanel            onChange={triggerChange} />
             case "notifications": return <NotificationsPanel onChange={triggerChange} />
-            case "appearance":    return <AppearancePanel    onChange={triggerChange} />
+            case "appearance":    return (
+                <AppearancePanel
+                    draftTheme={draftTheme}
+                    setDraftTheme={setDraftTheme}
+                    draftAccent={draftAccent}
+                    setDraftAccent={setDraftAccent}
+                    draftDensity={draftDensity}
+                    setDraftDensity={setDraftDensity}
+                    draftAnimations={draftAnimations}
+                    setDraftAnimations={setDraftAnimations}
+                    onResetToDefaults={handleResetToDefaults}
+                />
+            )
             case "security":      return <SecurityPanel      onChange={triggerChange} />
             case "api":           return <APIKeysPanel />
             case "integrations":  return <IntegrationsPanel />
@@ -106,7 +276,7 @@ export function SettingsPageContent() {
             </div>
 
             {/* Unsaved Changes Indicator float bar */}
-            {hasUnsavedChanges && (
+            {pageIsDirty && (
                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 bg-foreground text-background dark:bg-card dark:text-foreground border border-border shadow-2xl rounded-2xl px-4.5 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
                     <div className="flex items-center gap-2">
                         <Info size={14} className="text-primary" />
@@ -114,14 +284,14 @@ export function SettingsPageContent() {
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={() => setHasUnsavedChanges(false)}
-                            className="text-[10px] font-bold hover:underline px-2 py-1 rounded"
+                            onClick={handleDiscard}
+                            className="text-[10px] font-bold hover:underline px-2 py-1 rounded cursor-pointer"
                         >
                             Discard
                         </button>
                         <button
                             onClick={handleSaveAll}
-                            className="h-7 px-3 bg-primary text-primary-foreground text-[10px] font-bold rounded-lg hover:bg-primary/90 flex items-center gap-1 shadow-sm transition-all"
+                            className="h-7 px-3 bg-primary text-primary-foreground text-[10px] font-bold rounded-lg hover:bg-primary/90 flex items-center gap-1 shadow-sm transition-all cursor-pointer"
                         >
                             <Check size={10} /> Save Changes
                         </button>

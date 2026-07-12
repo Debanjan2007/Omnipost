@@ -33,6 +33,37 @@ export default function RootLayout({
             suppressHydrationWarning
             className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
         >
+        <head>
+            <script
+                dangerouslySetInnerHTML={{
+                    __html: `
+                        try {
+                            const cached = localStorage.getItem("appearance-settings");
+                            if (cached) {
+                                const settings = JSON.parse(cached);
+                                const accent = settings.accentColor || "indigo";
+                                const density = settings.density || "comfortable";
+                                const animations = settings.animations !== false ? "enabled" : "disabled";
+                                
+                                document.documentElement.setAttribute("data-accent", accent);
+                                document.documentElement.setAttribute("data-density", density);
+                                document.documentElement.setAttribute("data-animations", animations);
+                                
+                                const theme = settings.theme || "system";
+                                if (theme === "dark") {
+                                    document.documentElement.classList.add("dark");
+                                } else if (theme === "light") {
+                                    document.documentElement.classList.remove("dark");
+                                } else if (theme === "system") {
+                                    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                                    document.documentElement.classList.toggle("dark", systemPrefersDark);
+                                }
+                            }
+                        } catch (e) {}
+                    `
+                }}
+            />
+        </head>
         <body className="font-sans min-h-full flex flex-col">
         <ClerkProvider>
             {/* ThemeProvider + ProfileProvider — both client contexts */}
