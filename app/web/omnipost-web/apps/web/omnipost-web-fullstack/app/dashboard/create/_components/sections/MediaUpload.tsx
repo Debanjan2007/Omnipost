@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react"
 import { Upload, Image, Film, FileText, Sticker, X, Crop, Type, RotateCcw } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ImageCropper } from "../ui/ImageCropper"
 
 export interface MediaFile {
     id:      string
@@ -38,6 +39,7 @@ interface MediaUploadProps {
 export function MediaUpload({ files, setFiles }: MediaUploadProps) {
     const [dragging, setDragging] = useState(false)
     const [altTarget, setAltTarget] = useState<string | null>(null)
+    const [cropTarget, setCropTarget] = useState<MediaFile | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
     const addFiles = useCallback((incoming: File[]) => {
@@ -66,6 +68,14 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
     }
     function updateAlt(id: string, text: string) {
         setFiles(files.map(f => f.id === id ? { ...f, altText: text } : f))
+    }
+
+    const handleSaveCrop = (croppedUrl: string) => {
+        if (!cropTarget) return
+        setFiles(
+            files.map(f => f.id === cropTarget.id ? { ...f, url: croppedUrl } : f)
+        )
+        setCropTarget(null)
     }
 
     return (
@@ -138,9 +148,15 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
                                     className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors" title="Alt text">
                                     <Type size={12}/>
                                 </button>
-                                <button className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors" title="Crop">
-                                    <Crop size={12}/>
-                                </button>
+                                {f.type === "image" && (
+                                    <button
+                                        onClick={() => setCropTarget(f)}
+                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+                                        title="Crop Image"
+                                    >
+                                        <Crop size={12}/>
+                                    </button>
+                                )}
                                 <button className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors" title="Replace">
                                     <RotateCcw size={12}/>
                                 </button>
@@ -169,6 +185,15 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
                         <button onClick={() => setAltTarget(null)} className="shrink-0"><X size={13} className="text-muted-foreground"/></button>
                     </div>
                 </div>
+            )}
+
+            {/* Image Cropper Modal */}
+            {cropTarget && (
+                <ImageCropper
+                    file={cropTarget}
+                    onClose={() => setCropTarget(null)}
+                    onSave={handleSaveCrop}
+                />
             )}
         </div>
     )
