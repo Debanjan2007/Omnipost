@@ -1,8 +1,19 @@
-export default function CreatePostPage() {
-    return (
-        <div className="px-6 md:px-8 py-8 max-w-5xl mx-auto">
-            <h1 className="text-2xl font-bold text-foreground mb-2">Create Post</h1>
-            <p className="text-muted-foreground">Compose and schedule your next post.</p>
-        </div>
-    )
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
+import { CreatePostPage } from "./_components"
+
+export const metadata = {
+    title: "Create Post — OmniPost",
+    description: "Create once and publish everywhere across all your connected social platforms.",
+}
+
+/**
+ * /dashboard/create — protected server component.
+ * Auth check runs server-side; the client CreatePostPage renders the full UI.
+ */
+export default async function CreatePage() {
+    const { userId } = await auth()
+    if (!userId) redirect("/auth/login")
+
+    return <CreatePostPage/>
 }
