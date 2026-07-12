@@ -1,8 +1,19 @@
-export default function HistoryPage() {
-    return (
-        <div className="px-6 md:px-8 py-8 max-w-5xl mx-auto">
-            <h1 className="text-2xl font-bold text-foreground mb-2">History</h1>
-            <p className="text-muted-foreground">View all your past published posts.</p>
-        </div>
-    )
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
+import { HistoryPageContent } from "./_components"
+
+export const metadata = {
+    title: "Publishing History — OmniPost",
+    description: "Track and review every publishing event across all connected social channels.",
+}
+
+/**
+ * /dashboard/history — protected server component.
+ * Auth check runs server-side; the client HistoryPageContent renders the full UI.
+ */
+export default async function HistoryPage() {
+    const { userId } = await auth()
+    if (!userId) redirect("/auth/login")
+
+    return <HistoryPageContent/>
 }
