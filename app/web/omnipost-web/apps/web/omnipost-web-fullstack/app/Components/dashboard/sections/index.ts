@@ -1,0 +1,7 @@
+export { HeroSection }         from "./HeroSection"
+export { AnalyticsSection }    from "./AnalyticsSection"
+export { PerformanceSection }  from "./PerformanceSection"
+export { ContentSection }      from "./ContentSection"
+export { ActivitySection }     from "./ActivitySection"
+export { PlatformsSection }    from "./PlatformsSection"
+export { AIAssistantSection }  from "./AIAssistantSection"

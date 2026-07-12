@@ -74,6 +74,8 @@
     --color-brand-threads: #101010;
     --color-brand-bluesky: #0085FF;
     --color-brand-youtube: #FF0000;
+    --color-brand-tiktok: #010101;
+    --color-brand-pinterest: #E60023;
 
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
@@ -299,6 +301,17 @@
 .animate-float-medium {
     animation: floatMedium 4.5s ease-in-out infinite;
 }
+
+/* ─── Custom scrollbar ─────────────────────────────────────────────────────── */
+/* Replaces the ugly browser-default scrollbar with a thin, themed one. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar          { width: 5px; height: 5px; }
+*::-webkit-scrollbar-track    { background: transparent; }
+*::-webkit-scrollbar-thumb    { background-color: var(--border); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background-color: var(--muted-foreground); opacity: 0.5; }
 
 .animate-float-fast {
     animation: floatFast 3.5s ease-in-out infinite;
