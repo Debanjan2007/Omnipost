@@ -1,8 +1,19 @@
-export default function ConnectedAccountsPage() {
-    return (
-        <div className="px-6 md:px-8 py-8 max-w-5xl mx-auto">
-            <h1 className="text-2xl font-bold text-foreground mb-2">Connected Accounts</h1>
-            <p className="text-muted-foreground">Manage your linked social media accounts.</p>
-        </div>
-    )
+import { auth } from "@clerk/nextjs/server"
+import { redirect } from "next/navigation"
+import { ConnectedAccountsPage } from "./_components"
+
+export const metadata = {
+    title: "Connected Accounts — OmniPost",
+    description: "Manage and authorize your social media channels from one central security engine.",
+}
+
+/**
+ * /dashboard/accounts — Server component checking auth
+ * before rendering the ConnectedAccountsPage client orchestrator.
+ */
+export default async function AccountsPage() {
+    const { userId } = await auth()
+    if (!userId) redirect("/auth/login")
+
+    return <ConnectedAccountsPage />
 }
