@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./app/web/omnipost-web/apps/web/omnipost-web-fullstack/public/logo.png alt="OmniPost Logo" width="120" />
+  <img src="./app/web/omnipost-web/apps/web/omnipost-web-fullstack/public/logo.png" alt="OmniPost Logo" width="120" />
 </p>
 
 <h1 align="center">OmniPost</h1>
@@ -20,9 +20,10 @@
 </p>
 
 <p align="center">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-8-646CFF?style=for-the-badge&logo=vite" />
+  <img alt="Nextjs" src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
   <img alt="Turborepo" src="https://img.shields.io/badge/Turborepo-Monorepo-EF4444?style=for-the-badge&logo=turborepo" />
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/shadcn/ui-000000?style=for-the-badge&logo=shadcn/ui&logoColor=white" />
   <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss" />
 </p>
 
