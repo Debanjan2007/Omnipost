@@ -89,7 +89,7 @@ export function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             {/* ── User footer ───────────────────────────────────────────────── */}
             <div className="shrink-0 border-t border-sidebar-border px-4 py-4">
                 <Link
-                    href="/dashboard/settings/profile"
+                    href="/dashboard/settings"
                     onClick={onNavigate}
                     className="flex items-center gap-3 rounded-xl p-2 hover:bg-sidebar-accent/60 transition-colors duration-150 group"
                 >
