@@ -6,11 +6,13 @@ import {RippleButton} from "@/components/ui/ripple-button"
 import {InteractiveHoverButton} from "@/components/ui/interactive-hover-button"
 import {AnimatedThemeToggler} from "@/components/ui/animated-theme-toggler"
 import {LandingMain} from "@/app/Components/landing-main";
-
+import { Footer } from "@/app/Components/Footer";
+import { useTheme } from "@/app/context/ThemeContext"
 
 export default function Home() {
+    const { theme, setTheme } = useTheme()
     return (
-        <div className="landing-page h-screen w-screen overflow-hidden">
+        <div className="landing-page h-screen w-screen overflow-x-hidden">
             <nav className="relative z-50">
 
                 <div
@@ -20,29 +22,17 @@ export default function Home() {
                         <span className="text-2xl font-bold">OmniPost</span>
                     </div>
                     <div className="flex items-center lg:gap-6 md:gap-4">
-                        <button
-                            className="text-sm cursor-pointer font-medium text-text-secondary hover:text-text-primary transition">
-                            Solution
-                        </button>
-                        <button
-                            className="text-sm cursor-pointer font-medium text-text-secondary hover:text-text-primary transition">
-                            Features
-                        </button>
-                        <button
-                            className="text-sm cursor-pointer font-medium text-text-secondary hover:text-text-primary transition">
-                            Pricing
-                        </button>
-                        <button
-                            className="text-sm cursor-pointer font-medium text-text-secondary hover:text-text-primary transition">
-                            About
-                        </button>
-                        <button
-                            className="text-sm cursor-pointer font-medium text-text-secondary hover:text-text-primary transition">
-                            Contact
-                        </button>
+                        {['Solution', 'Features', 'Pricing', 'About', 'Contact'].map((item) => (
+                            <button
+                                key={item}
+                                className="text-sm cursor-pointer font-medium text-muted-foreground hover:text-foreground transition-colors duration-200"
+                            >
+                                {item}
+                            </button>
+                        ))}
                     </div>
                     <div className="controll-buttons flex items-center gap-4">
-                        <AnimatedThemeToggler/>
+                        <AnimatedThemeToggler theme={theme} onThemeChange={setTheme}/>
                         <RippleButton>
                             <Link href="/login">Login</Link>
                         </RippleButton>
@@ -61,6 +51,9 @@ export default function Home() {
             <main>
                 <LandingMain/>
             </main>
+            <footer>
+                <Footer />
+            </footer>
         </div>
     );
 }

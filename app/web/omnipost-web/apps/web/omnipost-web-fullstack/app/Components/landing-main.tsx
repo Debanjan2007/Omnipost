@@ -2,11 +2,14 @@
 
 import Link from "next/link"
 import {MorphingText} from "@/components/ui/morphing-text"
+import { KineticText } from "@/components/ui/kinetic-text"
+import { AnimatedBeamContainer } from "./AnimatedBeam"
+import { FAQSection } from "./FaqSection"
 
 export function LandingMain() {
     return (
         <>
-            <section className="bg-background flex flex-col justify-center items-center">
+            <section className="bg-background flex flex-col gap-4 items-center">
                 {/* 🔥 Hero */}
                 <div className="main grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-74px)]">
 
@@ -24,8 +27,7 @@ export function LandingMain() {
                                     texts={["Unify your social", "Publish Everywhere.", "Grow Your Audience.", "Analyze Performance.", "Collaborate Faster.", "Build Your Brand."]}
                                 />
                                 <br/>
-                                Elevate Your Influence.
-
+                                <KineticText text="Elevate Your Influence." />
                             </h1>
 
                             {/* Subtitle */}
@@ -56,7 +58,7 @@ export function LandingMain() {
 
                     {/* RIGHT */}
                     <div
-                        className="relative hidden md:flex lg:flex items-center justify-center px-5 sm:px-10 lg:px-0 pb-14 lg:pb-0 overflow-visible">
+                        className="relative hidden lg:flex items-center justify-center px-5 sm:px-10 lg:px-0 pb-14 lg:pb-0 overflow-visible">
 
                         {/* Background Pattern */}
                         <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-99">
@@ -240,6 +242,12 @@ export function LandingMain() {
 
                     </div>
 
+                </div>
+                <div className="w-full flex mt-22 py-6 items-center justify-center">
+                    <AnimatedBeamContainer />
+                </div>
+                <div className="w-full mt-6 py-6 flex items-center justify-center">
+                    <FAQSection />
                 </div>
             </section>
         </>
