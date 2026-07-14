@@ -3,6 +3,7 @@ import {Geist_Mono, Poppins} from "next/font/google";
 import "./globals.css";
 import {ClerkProvider} from '@clerk/nextjs'
 import {Providers} from "@/app/context/Providers"
+import { Toaster } from "sonner"
 
 const poppins = Poppins({
     variable: "--font-poppins",
@@ -69,6 +70,13 @@ export default function RootLayout({
             {/* ThemeProvider + ProfileProvider — both client contexts */}
             <Providers>
                 {children}
+                {/* Global toast notifications — position bottom-right */}
+                <Toaster
+                    position="bottom-right"
+                    richColors
+                    closeButton
+                    toastOptions={{ duration: 4000 }}
+                />
             </Providers>
         </ClerkProvider>
         </body>

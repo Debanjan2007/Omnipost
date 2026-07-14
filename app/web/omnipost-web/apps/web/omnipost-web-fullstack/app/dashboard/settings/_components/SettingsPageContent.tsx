@@ -18,6 +18,7 @@ import { AdvancedPanel } from "./panels/AdvancedPanel"
 import { Check, Info } from "lucide-react"
 import { useAppearance, useAppearanceStore, DEFAULT_SETTINGS, applyAttributesToDOM } from "@/app/context"
 import { useTheme } from "next-themes"
+import { toast } from "sonner"
 
 export function SettingsPageContent() {
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile")
@@ -115,28 +116,83 @@ export function SettingsPageContent() {
     }, [pageIsDirty])
 
     const handleSaveAppearance = async () => {
+        const body = {
+            theme: draftTheme,
+            accentColor: draftAccent,
+            density: draftDensity,
+            animations: draftAnimations,
+        }
+
+        console.log("[Appearance] Saving settings...", body)
+
+        let res: Response
         try {
-            const body = {
-                theme: draftTheme,
-                accentColor: draftAccent,
-                density: draftDensity,
-                animations: draftAnimations,
-            }
-            const res = await fetch("/api/appearance", {
+            res = await fetch("/api/appearance", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
                 body: JSON.stringify(body),
             })
-            if (!res.ok) throw new Error("Save request failed")
-            const savedSettings = await res.json()
-
-            // Update Zustand Store, writing back to local storage cache
-            setSettings(savedSettings)
-            alert("Appearance settings saved successfully.")
-        } catch (err) {
-            console.error("Failed to save appearance settings:", err)
-            alert("Failed to save changes. Please try again.")
+        } catch (networkError) {
+            // The request itself never left the browser (offline, DNS failure, etc.)
+            console.error("[Appearance] Network error", networkError)
+            toast.error("Network error", {
+                description: networkError instanceof Error
+                    ? networkError.message
+                    : "Could not reach the server. Check your internet connection.",
+            })
+            return
         }
+
+        // Always parse the JSON body — even error responses include a message field
+        let data: Record<string, unknown> = {}
+        try {
+            data = await res.json()
+        } catch {
+            console.error("[Appearance] Could not parse server response as JSON")
+        }
+
+        console.log("[Appearance] Server response", { status: res.status, data })
+
+        if (!res.ok) {
+            // Surface the exact server message the API returned
+            const serverMessage =
+                (data.message as string) ||
+                (data.error   as string) ||
+                `Unexpected server error (HTTP ${res.status})`
+
+            console.error("[Appearance] Save failed:", serverMessage, data)
+
+            if (res.status === 401) {
+                toast.error("Authentication expired", { description: serverMessage })
+            } else if (res.status === 400) {
+                toast.error("Validation error", { description: serverMessage })
+            } else if (res.status === 404) {
+                toast.error("User not found", { description: serverMessage })
+            } else {
+                toast.error("Failed to save appearance settings", { description: serverMessage })
+            }
+            return
+        }
+
+        // ── Success path ────────────────────────────────────────────────────────
+        const savedSettings = data as typeof body
+
+        // 1. Update Zustand store (also writes to localStorage + applies DOM attributes)
+        setSettings(savedSettings)
+
+        // 2. Keep next-themes in sync
+        if (savedSettings.theme) {
+            setNextTheme(savedSettings.theme as typeof draftTheme)
+        }
+
+        // 3. Clear the dirty state so the unsaved bar disappears
+        //    (the store sync above already applied DOM attributes)
+
+        console.log("[Appearance] Settings saved successfully", savedSettings)
+        toast.success("Appearance settings saved", {
+            description: "Your theme and interface preferences have been applied.",
+        })
     }
 
     const handleDiscard = () => {
@@ -159,34 +215,59 @@ export function SettingsPageContent() {
             await handleSaveAppearance()
         } else {
             setHasUnsavedChanges(false)
-            alert("All settings configurations saved successfully.")
+            toast.success("Settings saved", {
+                description: "All configuration changes have been applied.",
+            })
         }
     }
 
     const handleResetToDefaults = async () => {
+        console.log("[Appearance] Resetting to defaults...")
+
+        let res: Response
         try {
-            const res = await fetch("/api/appearance", {
+            res = await fetch("/api/appearance", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
                 body: JSON.stringify(DEFAULT_SETTINGS),
             })
-            if (!res.ok) throw new Error("Reset request failed")
-            const resetSettings = await res.json()
-
-            // Update store
-            setSettings(resetSettings)
-
-            // Reset local page drafts
-            setDraftTheme(resetSettings.theme)
-            setDraftAccent(resetSettings.accentColor)
-            setDraftDensity(resetSettings.density)
-            setDraftAnimations(resetSettings.animations)
-            
-            alert("Appearance settings reset to default values.")
-        } catch (err) {
-            console.error("Failed to reset appearance settings:", err)
-            alert("Failed to reset settings. Please try again.")
+        } catch (networkError) {
+            toast.error("Network error", {
+                description: networkError instanceof Error
+                    ? networkError.message
+                    : "Could not reach the server.",
+            })
+            return
         }
+
+        let data: Record<string, unknown> = {}
+        try {
+            data = await res.json()
+        } catch { /* non-JSON body */ }
+
+        if (!res.ok) {
+            const serverMessage =
+                (data.message as string) || (data.error as string) || `HTTP ${res.status}`
+            toast.error("Reset failed", { description: serverMessage })
+            return
+        }
+
+        const resetSettings = data as unknown as typeof DEFAULT_SETTINGS
+
+        // Update store + local drafts
+        setSettings(resetSettings)
+        setDraftTheme(resetSettings.theme       ?? DEFAULT_SETTINGS.theme)
+        setDraftAccent(resetSettings.accentColor ?? DEFAULT_SETTINGS.accentColor)
+        setDraftDensity(resetSettings.density    ?? DEFAULT_SETTINGS.density)
+        setDraftAnimations(resetSettings.animations ?? DEFAULT_SETTINGS.animations)
+
+        // Sync next-themes
+        if (resetSettings.theme) setNextTheme(resetSettings.theme)
+
+        toast.success("Reset to defaults", {
+            description: "Appearance settings have been restored to factory defaults.",
+        })
     }
 
     const renderActivePanel = () => {
