@@ -40,7 +40,7 @@ export async function GET() {
             },
             update: {
                 clerkId: clerkUser.id,
-                // Keep profile fresh on every signup/re-auth
+                // Keep profile fresh on every signup/re-oauth
                 name,
                 avatar: clerkUser.imageUrl ?? null,
                 refreshToken,

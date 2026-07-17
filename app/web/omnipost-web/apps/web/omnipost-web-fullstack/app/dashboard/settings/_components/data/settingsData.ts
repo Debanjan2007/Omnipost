@@ -38,15 +38,6 @@ export const SETTINGS_NAV_ITEMS: NavItem[] = [
     { id: "advanced", label: "Advanced Settings", iconName: Flame },
 ]
 
-export const MOCK_PROFILE = {
-    displayName: "Debanjan Dey",
-    username: "debanjan_dev",
-    email: "debanjan@omnipost.io",
-    bio: "Software Engineer & Creator. Building OmniPost to unify social media distribution.",
-    timezone: "Asia/Kolkata",
-    language: "en-US",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Debanjan&backgroundColor=b6e3f4"
-}
 
 export const MOCK_WORKSPACE = {
     name: "OmniPost Staging",
