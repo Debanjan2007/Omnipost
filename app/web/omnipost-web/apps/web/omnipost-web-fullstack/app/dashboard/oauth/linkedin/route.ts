@@ -1,16 +1,15 @@
 import auth from "@/app/dashboard/oauth/core";
-import { NextResponse } from 'next/server'
+import {NextResponse} from 'next/server'
 
 
-const linkedin = auth.getProvider("linkedin");
+const linkedin = auth.getProvider('Linkedin')
 
-export function GET(request: Request){
+export function GET(request: Request) {
     try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
+        console.log("getting linkedin oauth url linkedin: ", linkedin);
         const authorizationUrl = linkedin.getAuthorizationUrl()
         console.log("oauth url is: ", authorizationUrl)
-        if(!authorizationUrl) {
+        if (!authorizationUrl) {
             console.log("Authorization URL not found");
             return NextResponse.redirect(
                 new URL("/dashboard", request.url)
@@ -19,7 +18,8 @@ export function GET(request: Request){
         return NextResponse.redirect(
             new URL(authorizationUrl)
         )
-    }catch (error) {
+    } catch
+        (error) {
         console.log(error);
         return NextResponse.redirect(
             new URL("/dashboard", request.url)
