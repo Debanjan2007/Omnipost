@@ -1,4 +1,4 @@
-// Server Component — auth check then hands off to the client overview.
+// Server Component — oauth check then hands off to the client overview.
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { DashboardOverview } from '@/app/Components/dashboard/DashboardOverview'

@@ -16,7 +16,7 @@ type UserResource = {
 interface ProfileContextValue {
     /** The full Clerk UserResource object — null when signed out, undefined while loading */
     user: UserResource | null | undefined
-    /** True once Clerk has finished hydrating (safe to render auth-dependent UI) */
+    /** True once Clerk has finished hydrating (safe to render oauth-dependent UI) */
     isLoaded: boolean
     /** True when a user session is active */
     isSignedIn: boolean

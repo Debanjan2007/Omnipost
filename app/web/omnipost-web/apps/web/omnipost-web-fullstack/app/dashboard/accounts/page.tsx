@@ -4,11 +4,11 @@ import { ConnectedAccountsPage } from "./_components"
 
 export const metadata = {
     title: "Connected Accounts — OmniPost",
-    description: "Manage and authorize your social media channels from one central security engine.",
+    description: "Manage and oauth your social media channels from one central security engine.",
 }
 
 /**
- * /dashboard/accounts — Server component checking auth
+ * /dashboard/accounts — Server component checking oauth
  * before rendering the ConnectedAccountsPage client orchestrator.
  */
 export default async function AccountsPage() {
