@@ -17,7 +17,7 @@ const authUrlReturn = asyncHandler(async (req: Request, res: Response): Promise<
             res
                 .status(400)
                 .json(
-                    new ApiErrHandler(400, null, "Invalid auth state")
+                    new ApiErrHandler(400, null, "Invalid oauth state")
                 )
         }
         if (!req.query || !auth1 || !auth2) {
@@ -31,7 +31,7 @@ const authUrlReturn = asyncHandler(async (req: Request, res: Response): Promise<
             res
                 .status(401)
                 .json(
-                    new ApiErrHandler(401, null, "Invalid auth code")
+                    new ApiErrHandler(401, null, "Invalid oauth code")
                 )
         }
         const googleUrl: httpurl = googleProvider.getAuthorizationUrl()
