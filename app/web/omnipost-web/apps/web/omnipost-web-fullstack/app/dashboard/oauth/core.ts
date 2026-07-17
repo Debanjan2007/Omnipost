@@ -3,7 +3,7 @@ import type { httpurl } from "@deba_1307/uniauth"
 
 const auth = new Uniauth({
     providers: {
-        Linkedin: {
+        linkedin: {
             clientId: process.env.LINKEDIN_CLIENT_ID as unknown as string,
             scope: [
                 "openid" ,
