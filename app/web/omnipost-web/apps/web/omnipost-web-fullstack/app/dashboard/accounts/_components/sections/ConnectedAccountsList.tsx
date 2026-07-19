@@ -2,16 +2,23 @@
 
 import { useState, useEffect, useRef } from "react"
 import { MoreHorizontal, RefreshCcw, Trash2, Database } from "lucide-react"
+import { toast } from "sonner"
 import type { Account } from "../data/mockData"
+import type { ProviderConfig } from "../data/providersConfig"
 import { PlatformIcon } from "@/app/Components/dashboard/PlatformIcons"
 import { cn } from "@/lib/utils"
 
+export type AccountCardItem = 
+    | { type: "connected"; account: Account }
+    | { type: "unconnected"; provider: ProviderConfig }
+
 interface ConnectedAccountsListProps {
-    accounts: Account[]
+    items: AccountCardItem[]
     onSelectAccount: (account: Account) => void
     onOpenLogs: (account: Account) => void
     onReconnect: (accountId: string) => void
     onDisconnect: (accountId: string) => void
+    onConnectPlatform: (oauthPath?: string) => void
 }
 
 // ─── Card Action Menu ─────────────────────────────────────────────────────────
@@ -102,15 +109,73 @@ function getStatusPill(account: Account) {
 // ─── ConnectedAccountsList ────────────────────────────────────────────────────
 
 export function ConnectedAccountsList({
-    accounts,
+    items,
     onSelectAccount,
     onOpenLogs,
     onReconnect,
     onDisconnect,
+    onConnectPlatform,
 }: ConnectedAccountsListProps) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {accounts.map((account) => {
+            {items.map((item) => {
+                if (item.type === "unconnected") {
+                    const { provider } = item
+                    return (
+                        <div
+                            key={`unconnected-${provider.key}`}
+                            className={cn(
+                                "group bg-card border border-border/60 rounded-2xl p-5",
+                                "hover:border-border hover:shadow-md transition-all duration-200",
+                                "flex flex-col gap-4"
+                            )}
+                        >
+                            {/* Top row: Platform Icon + Not Connected badge */}
+                            <div className="flex items-start justify-between gap-2">
+                                <div className="relative shrink-0">
+                                    {provider.icon({ size: 44, className: "rounded-xl" })}
+                                </div>
+
+                                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 bg-zinc-500/10 text-zinc-500 border-zinc-500/20">
+                                    Not Connected
+                                </span>
+                            </div>
+
+                            {/* Platform name */}
+                            <div className="min-w-0 -mt-1">
+                                <h4 className="text-sm font-semibold text-foreground truncate leading-tight">
+                                    {provider.name}
+                                </h4>
+                                <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                                    Connect your {provider.name} account
+                                </p>
+                            </div>
+
+                            {/* Connect / Coming soon Button */}
+                            <div className="mt-auto pt-3 border-t border-border/40">
+                                {provider.enabled ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => onConnectPlatform(provider.oauthPath)}
+                                        className="w-full inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/95 transition-all shadow-sm cursor-pointer"
+                                    >
+                                        Connect
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => toast.error("This provider is not available yet.")}
+                                        className="w-full inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-xl bg-muted text-muted-foreground border border-border/50 text-xs font-semibold cursor-not-allowed"
+                                    >
+                                        Coming Soon
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )
+                }
+
+                const { account } = item
                 const statusPill = getStatusPill(account)
 
                 return (
@@ -181,3 +246,4 @@ export function ConnectedAccountsList({
         </div>
     )
 }
+
