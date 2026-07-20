@@ -14,7 +14,7 @@ export function RecentActivityTimeline() {
                     {RECENT_ACTIVITIES.map((activity) => (
                         <div key={activity.id} className="relative">
                             {/* Dot element */}
-                            <div className="absolute -left-[24px] top-0.5 w-4 h-4 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
+                            <div className="absolute -left-6 top-0.5 w-4 h-4 rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
                                 <PlatformIcon name={activity.platform} size={12} className="rounded-sm" />
                             </div>
 
@@ -23,9 +23,9 @@ export function RecentActivityTimeline() {
                                 <div className="flex justify-between items-center gap-2">
                                     <span className={cn(
                                         "text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider",
-                                        activity.type === "connected" && "bg-[color-mix(in_srgb,var(--color-success)_12%,transparent)] text-[var(--color-success)]",
-                                        activity.type === "refreshed" && "bg-[color-mix(in_srgb,var(--color-info)_12%,transparent)] text-[var(--color-info)]",
-                                        activity.type === "warning" && "bg-[color-mix(in_srgb,var(--color-warning)_12%,transparent)] text-[var(--color-warning)]",
+                                        activity.type === "connected" && "bg-[color-mix(in_srgb,var(--color-success)_12%,transparent)] text-(--color-success)",
+                                        activity.type === "refreshed" && "bg-[color-mix(in_srgb,var(--color-info)_12%,transparent)] text-(--color-info)",
+                                        activity.type === "warning" && "bg-[color-mix(in_srgb,var(--color-warning)_12%,transparent)] text-(--color-warning)",
                                         activity.type === "sync" && "bg-muted text-muted-foreground",
                                         activity.type === "error" && "bg-red-500/12 text-red-500"
                                     )}>

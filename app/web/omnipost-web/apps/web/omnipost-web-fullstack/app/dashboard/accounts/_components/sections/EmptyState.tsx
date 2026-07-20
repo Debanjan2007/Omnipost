@@ -1,6 +1,6 @@
 "use client"
 
-import { Wifi, Sparkles, Plus } from "lucide-react"
+import { Wifi, Plus } from "lucide-react"
 
 interface EmptyStateProps {
     onConnectClick: () => void
@@ -12,7 +12,7 @@ export function EmptyState({ onConnectClick }: EmptyStateProps) {
             {/* Design elements */}
             <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center relative">
                 <Wifi size={24} className="text-primary" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-[var(--color-success)] rounded-full border-2 border-card animate-pulse" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-(--color-success) rounded-full border-2 border-card animate-pulse" />
             </div>
 
             {/* Content text */}

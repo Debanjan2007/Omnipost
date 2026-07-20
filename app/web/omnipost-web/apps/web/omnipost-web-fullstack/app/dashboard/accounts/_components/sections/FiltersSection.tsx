@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Search, Filter, ArrowUpDown, Check, ChevronDown } from "lucide-react"
+import { Search, Check, ChevronDown } from "lucide-react"
 import { PlatformIcon } from "@/app/Components/dashboard/PlatformIcons"
 import { cn } from "@/lib/utils"
 

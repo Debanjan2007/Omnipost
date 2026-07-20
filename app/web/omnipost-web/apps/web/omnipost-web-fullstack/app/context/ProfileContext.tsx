@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, type ReactNode } from "react"
+import { createContext, useContext, useEffect, type ReactNode } from "react"
 import { useUser } from "@clerk/nextjs"
 // Minimal UserResource type to avoid depending on @clerk/types in this file
 type UserResource = {
@@ -70,6 +70,42 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         lastName,
     }
 
+    useEffect(() => {
+        if (!isLoaded) return
+
+        if (isSignedIn && user) {
+            // Read existing cookie to see if we have a database user ID saved
+            let dbId: number | null = null
+            try {
+                const existingCookie = getClientCookie("omnipost_user")
+                if (existingCookie) {
+                    const parsed = JSON.parse(existingCookie)
+                    if (parsed && parsed.clerkId === user.id && typeof parsed.id === "number") {
+                        dbId = parsed.id
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to parse omnipost_user cookie:", e)
+            }
+
+            const userObj = {
+                id: dbId,
+                clerkId: user.id,
+                email,
+                name: displayName,
+                avatar: avatarUrl,
+                firstName,
+                lastName,
+                username: user.username ?? null,
+            }
+
+            setClientCookie("omnipost_user", JSON.stringify(userObj), 7)
+        } else {
+            // Clear cookie on sign-out
+            deleteClientCookie("omnipost_user")
+        }
+    }, [user, isLoaded, isSignedIn, displayName, email, avatarUrl, firstName, lastName])
+
     return (
         <ProfileContext.Provider value={value}>
             {children}
@@ -91,4 +127,34 @@ export function useProfile(): ProfileContextValue {
         throw new Error("useProfile() must be called inside <ProfileProvider>")
     }
     return ctx
+}
+
+// ─── Cookie Utilities ────────────────────────────────────────────────────────
+
+function getClientCookie(name: string): string | null {
+    if (typeof document === "undefined") return null
+    const nameLenPlus = name.length + 1
+    return (
+        document.cookie
+            .split(";")
+            .map((c) => c.trim())
+            .filter((cookie) => cookie.substring(0, nameLenPlus) === `${name}=`)
+            .map((cookie) => decodeURIComponent(cookie.substring(nameLenPlus)))[0] ?? null
+    )
+}
+
+function setClientCookie(name: string, value: string, days?: number) {
+    if (typeof document === "undefined") return
+    let expires = ""
+    if (days) {
+        const date = new Date()
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000)
+        expires = `; expires=${date.toUTCString()}`
+    }
+    document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/; SameSite=Lax; secure`
+}
+
+function deleteClientCookie(name: string) {
+    if (typeof document === "undefined") return
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; secure`
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { MOCK_BILLING } from "../data/settingsData"
-import { CreditCard, ArrowUpRight, DollarSign } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 
 export function BillingPanel() {
     const b = MOCK_BILLING

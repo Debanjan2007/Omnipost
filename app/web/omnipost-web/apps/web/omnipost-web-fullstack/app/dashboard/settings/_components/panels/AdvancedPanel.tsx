@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Database, FileUp, RefreshCw, AlertTriangle, Code2 } from "lucide-react"
+import { Database, RefreshCw } from "lucide-react"
 
 interface PanelProps {
     onChange: () => void

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Shield, KeyRound, Monitor, Smartphone, Trash2 } from "lucide-react"
+import { Shield, Monitor, Smartphone, Trash2 } from "lucide-react"
 
 interface PanelProps {
     onChange: () => void

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { MOCK_WORKSPACE } from "../data/settingsData"
-import { Building, ShieldAlert, AlertTriangle } from "lucide-react"
+import { Building, ShieldAlert } from "lucide-react"
 
 interface PanelProps {
     onChange: () => void

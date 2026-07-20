@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Bell } from "lucide-react"
 
 interface PanelProps {
     onChange: () => void

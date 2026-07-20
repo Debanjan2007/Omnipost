@@ -1,6 +1,6 @@
 "use client"
 
-import { Share2, RefreshCcw, Wifi, AlertTriangle } from "lucide-react"
+import { Share2, Wifi, AlertTriangle } from "lucide-react"
 
 export function ConnectedAccountsPanel() {
     const platforms = [

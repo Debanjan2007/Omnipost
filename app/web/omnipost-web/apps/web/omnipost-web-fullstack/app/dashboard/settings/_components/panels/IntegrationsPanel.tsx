@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { MOCK_INTEGRATIONS } from "../data/settingsData"
-import { Blocks, Settings2, ShieldCheck, ShieldAlert } from "lucide-react"
+import { Settings2 } from "lucide-react"
 
 export function IntegrationsPanel() {
     const [integrations, setIntegrations] = useState(MOCK_INTEGRATIONS)

@@ -1,12 +1,15 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Plus, RefreshCcw } from "lucide-react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { MOCK_ACCOUNTS, type Account } from "./data/mockData"
+import { PROVIDERS_CONFIG, type ProviderConfig } from "./data/providersConfig"
 import { OverviewCards } from "./sections/OverviewCards"
 import { FiltersSection } from "./sections/FiltersSection"
-import { ConnectedAccountsList } from "./sections/ConnectedAccountsList"
+import { ConnectedAccountsList, type AccountCardItem } from "./sections/ConnectedAccountsList"
 import { AccountDrawer } from "./sections/AccountDrawer"
 import { MonitoringPanel } from "./sections/MonitoringPanel"
 import { EmptyState } from "./sections/EmptyState"
@@ -25,37 +28,36 @@ export function ConnectedAccountsPage() {
     const [statusFilter, setStatusFilter] = useState("all")
     const [sortOption, setSortOption] = useState("recent")
 
+    const searchParams = useSearchParams()
+    const router = useRouter()
+
+    useEffect(() => {
+        const error = searchParams.get("error")
+        const success = searchParams.get("success")
+        if (error) {
+            toast.error(decodeURIComponent(error))
+            // Clear URL search params without triggering full reload/rerender
+            router.replace("/dashboard/accounts")
+        }
+        if (success) {
+            toast.success(decodeURIComponent(success))
+            router.replace("/dashboard/accounts")
+        }
+    }, [searchParams, router])
+
     // ── Actions ───────────────────────────────────────────────────────────────
 
     const handleConnectAccount = (platformName: string) => {
-        const newAcc: Account = {
-            id: `acc-${Date.now()}`,
-            platform: platformName as Account["platform"],
-            name: `OmniPost ${platformName} Channel`,
-            username: `@omnipost_${platformName.toLowerCase()}`,
-            avatarUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=" + platformName,
-            verified: false,
-            followerCount: "1.2K",
-            connectedStatus: "connected",
-            healthStatus: "excellent",
-            lastSync: "Just now",
-            apiVersion: "v1.0 (OAuth2)",
-            permissionsSummary: "Full read-write scopes authorized",
-            businessType: "Creator",
-            connectedSince: "Today",
-            tokenExpiry: "60 days remaining",
-            webhookStatus: "active",
-            syncLogs: [{ time: "Just now", event: "Initial authorization check", status: "success" }],
-            grantedPermissions: [
-                { name: "Publish Posts",    granted: true, required: true },
-                { name: "Upload Images",    granted: true, required: true },
-                { name: "Upload Videos",    granted: true, required: true },
-                { name: "Read Analytics",   granted: true, required: true },
-                { name: "Read Profile Info",granted: true, required: true },
-            ],
+        const provider = Object.values(PROVIDERS_CONFIG).find(
+            p => p.name.toLowerCase() === platformName.toLowerCase() || p.key.toLowerCase() === platformName.toLowerCase()
+        )
+        if (provider) {
+            if (provider.enabled && provider.oauthPath) {
+                router.push(provider.oauthPath)
+            } else {
+                toast.error("This provider is not available yet.")
+            }
         }
-        setAccounts(prev => [newAcc, ...prev])
-        setSelectedAccount(newAcc)
         setIsDialogOpen(false)
     }
 
@@ -104,28 +106,74 @@ export function ConnectedAccountsPage() {
         }, 1000)
     }
 
-    // ── Filtering & Sorting ────────────────────────────────────────────────────
+    // ── Merging and Filtering ──────────────────────────────────────────────────
 
-    const filteredAccounts = useMemo(() => {
-        return accounts
-            .filter(acc => {
-                const queryMatch =
-                    acc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    acc.username.toLowerCase().includes(searchQuery.toLowerCase())
-                const platformMatch = platformFilter === "all" || acc.platform === platformFilter
-                const statusMatch  = statusFilter  === "all" || acc.connectedStatus === statusFilter
-                return queryMatch && platformMatch && statusMatch
+    const mergedItems = useMemo(() => {
+        const items: AccountCardItem[] = accounts.map(acc => ({ type: "connected" as const, account: acc }))
+
+        // For each provider in PROVIDERS_CONFIG, if there are NO connected accounts for it, add an unconnected item.
+        Object.values(PROVIDERS_CONFIG).forEach(provider => {
+            const hasConnected = accounts.some(acc => acc.platform.toLowerCase() === provider.key.toLowerCase())
+            if (!hasConnected) {
+                items.push({ type: "unconnected" as const, provider })
+            }
+        })
+
+        return items
+    }, [accounts])
+
+    const filteredItems = useMemo(() => {
+        return mergedItems
+            .filter(item => {
+                // 1. Search Query
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase()
+                    if (item.type === "connected") {
+                        const nameMatch = item.account.name.toLowerCase().includes(q)
+                        const userMatch = item.account.username.toLowerCase().includes(q)
+                        if (!nameMatch && !userMatch) return false
+                    } else {
+                        const nameMatch = item.provider.name.toLowerCase().includes(q)
+                        const descMatch = item.provider.desc.toLowerCase().includes(q)
+                        if (!nameMatch && !descMatch) return false
+                    }
+                }
+
+                // 2. Platform Filter
+                if (platformFilter !== "all") {
+                    const itemPlatform = item.type === "connected" ? item.account.platform : item.provider.name
+                    if (itemPlatform.toLowerCase() !== platformFilter.toLowerCase()) return false
+                }
+
+                // 3. Status Filter
+                if (statusFilter !== "all") {
+                    if (item.type === "connected") {
+                        if (item.account.connectedStatus !== statusFilter) return false
+                    } else {
+                        if (statusFilter !== "disconnected") return false // Unconnected is treated as disconnected
+                    }
+                }
+
+                return true
             })
             .sort((a, b) => {
-                if (sortOption === "alphabetical") return a.name.localeCompare(b.name)
+                if (sortOption === "alphabetical") {
+                    const nameA = a.type === "connected" ? a.account.name : a.provider.name
+                    const nameB = b.type === "connected" ? b.account.name : b.provider.name
+                    return nameA.localeCompare(nameB)
+                }
                 if (sortOption === "followers") {
-                    const numA = parseInt(a.followerCount.replace(/[^0-9]/g, "")) || 0
-                    const numB = parseInt(b.followerCount.replace(/[^0-9]/g, "")) || 0
-                    return numB - numA
+                    const fA = a.type === "connected" ? parseInt(a.account.followerCount.replace(/[^0-9]/g, "")) || 0 : 0
+                    const fB = b.type === "connected" ? parseInt(b.account.followerCount.replace(/[^0-9]/g, "")) || 0 : 0
+                    return fB - fA
+                }
+                // default: recent (connected first, then unconnected)
+                if (a.type !== b.type) {
+                    return a.type === "connected" ? -1 : 1
                 }
                 return 0
             })
-    }, [accounts, searchQuery, platformFilter, statusFilter, sortOption])
+    }, [mergedItems, searchQuery, platformFilter, statusFilter, sortOption])
 
     // ── Computed stats ────────────────────────────────────────────────────────
 
@@ -193,15 +241,22 @@ export function ConnectedAccountsPage() {
                     />
 
                     {/* Account grid — always full width */}
-                    {filteredAccounts.length === 0 ? (
+                    {filteredItems.length === 0 ? (
                         <EmptyState onConnectClick={() => setIsDialogOpen(true)} />
                     ) : (
                         <ConnectedAccountsList
-                            accounts={filteredAccounts}
+                            items={filteredItems}
                             onSelectAccount={setSelectedAccount}
                             onOpenLogs={(acc) => { setSelectedAccount(acc) }}
                             onReconnect={handleReconnect}
                             onDisconnect={handleDisconnect}
+                            onConnectPlatform={(oauthPath) => {
+                                if (oauthPath) {
+                                    router.push(oauthPath)
+                                } else {
+                                    toast.error("This provider is not available yet.")
+                                }
+                            }}
                         />
                     )}
 
@@ -227,3 +282,4 @@ export function ConnectedAccountsPage() {
         </div>
     )
 }
+

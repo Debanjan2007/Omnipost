@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { X, Search, Sparkles, Check } from "lucide-react"
-import { SUPPORTED_PLATFORMS } from "../data/mockData"
-import { PlatformIcon } from "@/app/Components/dashboard/PlatformIcons"
+import { toast } from "sonner"
+import { PROVIDERS_CONFIG } from "../data/providersConfig"
 import { cn } from "@/lib/utils"
 
 interface ConnectAccountDialogProps {
@@ -14,21 +14,20 @@ interface ConnectAccountDialogProps {
 
 export function ConnectAccountDialog({ isOpen, onClose, onConnect }: ConnectAccountDialogProps) {
     const [searchQuery, setSearchQuery] = useState("")
-    const [connecting, setConnecting] = useState<string | null>(null)
 
     if (!isOpen) return null
 
-    const filteredPlatforms = SUPPORTED_PLATFORMS.filter(p =>
+    const filteredPlatforms = Object.values(PROVIDERS_CONFIG).filter(p =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.desc.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
-    const handleConnectClick = (platformName: string) => {
-        setConnecting(platformName)
-        setTimeout(() => {
-            onConnect(platformName)
-            setConnecting(null)
-        }, 1500)
+    const handleConnectClick = (platformName: string, enabled: boolean) => {
+        if (!enabled) {
+            toast.error("This provider is not available yet.")
+            return
+        }
+        onConnect(platformName)
     }
 
     return (
@@ -76,15 +75,27 @@ export function ConnectAccountDialog({ isOpen, onClose, onConnect }: ConnectAcco
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             {filteredPlatforms.map((platform) => (
                                 <div
-                                    key={platform.name}
-                                    className="group relative bg-muted/20 hover:bg-muted/40 border border-border/60 hover:border-primary/40 rounded-xl p-4 transition-all duration-250 flex flex-col justify-between"
+                                    key={platform.key}
+                                    className={cn(
+                                        "group relative bg-muted/20 border border-border/60 rounded-xl p-4 transition-all duration-250 flex flex-col justify-between",
+                                        platform.enabled 
+                                            ? "hover:bg-muted/40 hover:border-primary/40" 
+                                            : "opacity-70 bg-muted/5 cursor-not-allowed select-none"
+                                    )}
                                 >
                                     <div className="space-y-2.5">
                                         <div className="flex items-center gap-3">
-                                            <PlatformIcon name={platform.name} size={36} className="shadow-sm rounded-lg" />
-                                            <div>
-                                                <h4 className="text-xs font-bold text-foreground">{platform.name}</h4>
-                                                <p className="text-[10px] text-muted-foreground font-medium">API OAuth2</p>
+                                            {platform.icon({ size: 36, className: "shadow-sm rounded-lg" })}
+                                            <div className="flex-1 flex items-center justify-between gap-1">
+                                                <div>
+                                                    <h4 className="text-xs font-bold text-foreground">{platform.name}</h4>
+                                                    <p className="text-[10px] text-muted-foreground font-medium">API OAuth2</p>
+                                                </div>
+                                                {!platform.enabled && (
+                                                    <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
+                                                        Coming Soon
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                         <p className="text-[11px] text-muted-foreground/90 leading-normal">{platform.desc}</p>
@@ -93,7 +104,7 @@ export function ConnectAccountDialog({ isOpen, onClose, onConnect }: ConnectAcco
                                         <div className="flex flex-wrap gap-1 pt-1">
                                             {platform.features.map(f => (
                                                 <span key={f} className="text-[9px] font-medium px-2 py-0.5 rounded-full bg-card border border-border/60 text-muted-foreground flex items-center gap-0.5">
-                                                    <Check size={8} className="text-[var(--color-success)]" /> {f}
+                                                    <Check size={8} className="text-(--color-success)" /> {f}
                                                 </span>
                                             ))}
                                         </div>
@@ -102,23 +113,15 @@ export function ConnectAccountDialog({ isOpen, onClose, onConnect }: ConnectAcco
                                     {/* Action Button */}
                                     <button
                                         type="button"
-                                        disabled={connecting !== null}
-                                        onClick={() => handleConnectClick(platform.name)}
+                                        onClick={() => handleConnectClick(platform.name, platform.enabled)}
                                         className={cn(
                                             "mt-4 w-full h-8 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-sm",
-                                            connecting === platform.name
-                                                ? "bg-muted text-muted-foreground border border-border"
-                                                : "bg-primary text-primary-foreground hover:bg-primary/95 hover:scale-[1.01] active:scale-95"
+                                            platform.enabled
+                                                ? "bg-primary text-primary-foreground hover:bg-primary/95 hover:scale-[1.01] active:scale-95 cursor-pointer"
+                                                : "bg-muted text-muted-foreground border border-border/50 cursor-not-allowed"
                                         )}
                                     >
-                                        {connecting === platform.name ? (
-                                            <>
-                                                <span className="w-3 h-3 rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground animate-spin" />
-                                                Authorizing...
-                                            </>
-                                        ) : (
-                                            "Connect Network"
-                                        )}
+                                        {platform.enabled ? "Connect Network" : "Coming Soon"}
                                     </button>
                                 </div>
                             ))}

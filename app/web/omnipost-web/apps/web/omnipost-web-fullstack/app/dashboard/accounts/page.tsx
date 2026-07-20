@@ -1,6 +1,8 @@
+import { Suspense } from "react"
 import { auth } from "@clerk/nextjs/server"
 import { redirect } from "next/navigation"
 import { ConnectedAccountsPage } from "./_components"
+import AccountsLoading from "./loading"
 
 export const metadata = {
     title: "Connected Accounts — OmniPost",
@@ -15,5 +17,10 @@ export default async function AccountsPage() {
     const { userId } = await auth()
     if (!userId) redirect("/auth/login")
 
-    return <ConnectedAccountsPage />
+    return (
+        <Suspense fallback={<AccountsLoading />}>
+            <ConnectedAccountsPage />
+        </Suspense>
+    )
 }
+
