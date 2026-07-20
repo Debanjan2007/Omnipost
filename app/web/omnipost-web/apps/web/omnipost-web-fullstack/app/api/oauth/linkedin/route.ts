@@ -8,22 +8,22 @@ const linkedin = auth.getProvider('Linkedin')
 export async function GET(req: NextRequest) {
     const cookieStore = await cookies()
     const userCookie = cookieStore.get("omnipost_user")
-
-    let dbUserId: number | undefined = undefined
-    if (userCookie?.value) {
-        try {
-            const parsed = JSON.parse(userCookie.value)
-            if (typeof parsed.id === 'number') {
-                dbUserId = parsed.id
-            }
-        } catch (e) {
-            console.error("Failed to parse omnipost_user cookie in linkedin oauth route:", e)
-            return NextResponse.redirect(
-                new URL('/dashboard?error=linkedin_oauth_failed', req.url).toString(),
-            )
-        }
+    console.log("userCookie is: ", userCookie?.value)
+    if(!userCookie?.value || !userCookie) {
+        return NextResponse.redirect(
+            new URL('/dashboard?error=linkedin_oauth_failed', req.url).toString(),
+        )
     }
-
+    const user = JSON.parse(userCookie.value)
+    console.log("user is: ", user)
+    if(!user || !user.clerkId) {
+        console.log("user is null")
+        return NextResponse.redirect(
+            new URL('/dashboard?error=linkedin_oauth_failed', req.url).toString(),
+        )
+    }
+    const dbUserId: string = user.clerkId
+    console.log("dbUserId is: ", dbUserId)
     try {
         const {searchParams} = req.nextUrl
         const code = searchParams.get('code')
@@ -32,39 +32,32 @@ export async function GET(req: NextRequest) {
         console.log("The token is : ", token)
         const profile = await linkedin.getUserProfile(token.accessToken)
         console.log("Profile is : ", profile)
-
-        let account = null
-        if (dbUserId) {
-            const existingAccount = await prisma.accounts.findFirst({
-                where: {
+        const expiresIn = token.expiresIn as unknown as number
+        const account = await prisma.accounts.upsert({
+            where: {
+                userID_provider: {
                     userID: dbUserId,
-                    provider: 'linkedin',
+                    provider: 'linkedin'
                 }
-            })
-
-            if (existingAccount) {
-                account = await prisma.accounts.update({
-                    where: {id: existingAccount.id},
-                    data: {
-                        accessToken: token?.accessToken,
-                        refreshToken: token?.refreshToken,
-                        expiresAt: token.expiresIn as unknown as Date,
-                    }
-                })
-            } else {
-                account = await prisma.accounts.create({
-                    data: {
-                        userID: dbUserId,
-                        provider: 'linkedin',
-                        providerAccountId: profile.username || profile.email || '',
-                        accessToken: token.accessToken,
-                        expiresAt: token.expiresIn as unknown as Date,
-                    }
-                })
+            },
+            update: {
+                accessToken: token.accessToken,
+                refreshToken: token.refreshToken,
+                expiresAt: new Date(Date.now() + expiresIn * 1000)
+            },
+            create: {
+                userID: user.clerkId,
+                provider: 'linkedin',
+                providerAccountId: profile.email ? profile.email : "",
+                accessToken: token.accessToken,
+                refreshToken: token.refreshToken,
+                expiresAt: new Date(Date.now() + expiresIn * 1000)
             }
-        }
+        })
         console.log("Accounts is : ", account)
-        return NextResponse.json({profile, account})
+        return NextResponse.redirect(
+            new URL('/dashboard/accounts?success=linkedin_connection_true', req.url).toString(),
+        )
     } catch (error) {
         console.log("error is: ",error)
         return NextResponse.redirect(
