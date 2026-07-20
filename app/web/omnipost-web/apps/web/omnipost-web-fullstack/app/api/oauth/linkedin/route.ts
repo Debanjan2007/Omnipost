@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     console.log("userCookie is: ", userCookie?.value)
     if(!userCookie?.value || !userCookie) {
         return NextResponse.redirect(
-            new URL('/dashboard?error=linkedin_oauth_failed', req.url).toString(),
+            new URL('/dashboard?toast=${TOAST_EVENTS.linkedin_auth_failed}', req.url).toString(),
         )
     }
     const user = JSON.parse(userCookie.value)
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     if(!user || !user.clerkId) {
         console.log("user is null")
         return NextResponse.redirect(
-            new URL('/dashboard?error=linkedin_oauth_failed', req.url).toString(),
+            new URL('/dashboard?toast=${TOAST_EVENTS.linkedin_auth_failed}', req.url).toString(),
         )
     }
     const dbUserId: string = user.clerkId
@@ -56,12 +56,12 @@ export async function GET(req: NextRequest) {
         })
         console.log("Accounts is : ", account)
         return NextResponse.redirect(
-            new URL('/dashboard/accounts?success=linkedin_connection_true', req.url).toString(),
+            new URL('/dashboard/accounts?toast=${TOAST_EVENTS.linkedin_connected}', req.url).toString(),
         )
     } catch (error) {
         console.log("error is: ",error)
         return NextResponse.redirect(
-            new URL('/dashboard?error=linkedin_oauth_failed', req.url).toString(),
+            new URL('/dashboard?toast=${TOAST_EVENTS.linkedin_callback_failed}', req.url).toString(),
         )
     }
 }
