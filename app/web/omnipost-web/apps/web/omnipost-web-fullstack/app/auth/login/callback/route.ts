@@ -61,6 +61,25 @@ export async function GET() {
             path: '/',
         })
 
+        const userCookiePayload = {
+            id: user.id,
+            clerkId: clerkUser.id,
+            email,
+            name,
+            avatar: clerkUser.imageUrl ?? null,
+            firstName: clerkUser.firstName ?? null,
+            lastName: clerkUser.lastName ?? null,
+            username: clerkUser.username ?? null,
+        }
+
+        response.cookies.set('omnipost_user', JSON.stringify(userCookiePayload), {
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: '/',
+        })
+
         return response
     } catch (err) {
         console.error('[login/callback] Error:', err)
