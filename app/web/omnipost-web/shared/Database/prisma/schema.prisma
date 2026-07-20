@@ -56,15 +56,18 @@ model User {
 
 model Accounts {
   id                String      @id @unique @default(uuid(4))
-  userID            Int
-  user              User        @relation(fields: [userID], references: [id])
+  userID            String
+  user              User        @relation(fields: [userID], references: [clerkId])
   provider          SocialMedia
   providerAccountId String
   accessToken       String
   refreshToken      String?
   expiresAt         DateTime
   createdDat        DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
+  updatedAt         DateTime?   @updatedAt
+
+  @@unique([userID, provider])
+  @@unique([provider, providerAccountId])
 }
 
 model Post {
