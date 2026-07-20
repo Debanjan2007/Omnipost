@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Sparkles, Sliders } from "lucide-react"
+import { Sliders } from "lucide-react"
 
 interface PanelProps {
     onChange: () => void

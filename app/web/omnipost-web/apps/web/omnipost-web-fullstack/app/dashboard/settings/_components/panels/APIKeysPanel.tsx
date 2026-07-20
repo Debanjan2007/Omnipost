@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { MOCK_API_KEYS } from "../data/settingsData"
-import { KeyRound, Plus, Copy, RefreshCw, Trash2, Check } from "lucide-react"
+import { Plus, Copy, Trash2, Check } from "lucide-react"
 
 export function APIKeysPanel() {
     const [keys, setKeys] = useState(MOCK_API_KEYS)
