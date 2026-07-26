@@ -7,28 +7,7 @@ import type {Account} from "../data/mockData"
 import type {ProviderConfig} from "../data/providersConfig"
 import {PlatformIcon} from "@/app/Components/dashboard/PlatformIcons"
 import {cn} from "@/lib/utils"
-import {cookies} from 'next/headers';
-import {prisma} from "@repo/database/src/index";
 
-
-async function ConnectedAccountList() {
-    const cookieStore = await cookies();
-    const Omnipostuser = cookieStore.get('omnipost_user')
-    if(!Omnipostuser) return (
-        <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground text-sm">No user found</p>
-        </div>
-    )
-    const user = JSON.parse(Omnipostuser?.value)
-    const connectedAccounts = prisma.accounts.findMany({
-        where: {
-            userID: user.clerkId,
-            expiresAt: {
-                gt: new Date(),
-            }
-        }
-    });
-}
 
 export type AccountCardItem =
     | { type: "connected"; account: Account }

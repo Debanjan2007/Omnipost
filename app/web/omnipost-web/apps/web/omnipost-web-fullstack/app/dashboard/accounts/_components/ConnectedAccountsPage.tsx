@@ -5,7 +5,7 @@ import { Plus, RefreshCcw } from "lucide-react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { toast } from "sonner"
 
-import { MOCK_ACCOUNTS, type Account } from "./data/mockData"
+import type { Account } from "./data/mockData"
 import { PROVIDERS_CONFIG, type ProviderConfig } from "./data/providersConfig"
 import { OverviewCards } from "./sections/OverviewCards"
 import { FiltersSection } from "./sections/FiltersSection"
@@ -15,8 +15,12 @@ import { MonitoringPanel } from "./sections/MonitoringPanel"
 import { EmptyState } from "./sections/EmptyState"
 import { ConnectAccountDialog } from "./sections/ConnectAccountDialog"
 
-export function ConnectedAccountsPage() {
-    const [accounts, setAccounts] = useState<Account[]>(MOCK_ACCOUNTS)
+interface ConnectedAccountsPageProps {
+    initialAccounts: Account[]
+}
+
+export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPageProps) {
+    const [accounts, setAccounts] = useState<Account[]>(initialAccounts)
     // Drawer is closed by default — null means no account selected
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
