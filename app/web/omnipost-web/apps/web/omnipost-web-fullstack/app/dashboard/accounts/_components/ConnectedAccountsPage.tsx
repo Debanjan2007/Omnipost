@@ -1,25 +1,26 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
-import { Plus, RefreshCcw } from "lucide-react"
-import { useSearchParams, useRouter } from "next/navigation"
-import { toast } from "sonner"
+import {useState, useMemo, useEffect} from "react"
+import {Plus, RefreshCcw} from "lucide-react"
+import {useSearchParams, useRouter} from "next/navigation"
+import {toast} from "sonner"
 
-import type { Account } from "./data/mockData"
-import { PROVIDERS_CONFIG, type ProviderConfig } from "./data/providersConfig"
-import { OverviewCards } from "./sections/OverviewCards"
-import { FiltersSection } from "./sections/FiltersSection"
-import { ConnectedAccountsList, type AccountCardItem } from "./sections/ConnectedAccountsList"
-import { AccountDrawer } from "./sections/AccountDrawer"
-import { MonitoringPanel } from "./sections/MonitoringPanel"
-import { EmptyState } from "./sections/EmptyState"
-import { ConnectAccountDialog } from "./sections/ConnectAccountDialog"
+import type {Account} from "./data/mockData"
+import {PROVIDERS_CONFIG, type ProviderConfig} from "./data/providersConfig"
+import {OverviewCards} from "./sections/OverviewCards"
+import {FiltersSection} from "./sections/FiltersSection"
+import {ConnectedAccountsList, type AccountCardItem} from "./sections/ConnectedAccountsList"
+import {AccountDrawer} from "./sections/AccountDrawer"
+import {MonitoringPanel} from "./sections/MonitoringPanel"
+import {EmptyState} from "./sections/EmptyState"
+import {ConnectAccountDialog} from "./sections/ConnectAccountDialog"
+import {DisconnectAccount} from "./action"
 
 interface ConnectedAccountsPageProps {
     initialAccounts: Account[]
 }
 
-export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPageProps) {
+export function ConnectedAccountsPage({initialAccounts}: ConnectedAccountsPageProps) {
     const [accounts, setAccounts] = useState<Account[]>(initialAccounts)
     // Drawer is closed by default — null means no account selected
     const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
@@ -76,7 +77,7 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
                 tokenExpiry: "60 days remaining",
                 webhookStatus: "active",
                 syncLogs: [
-                    { time: "Just now", event: "Token reauthorization successful", status: "success" },
+                    {time: "Just now", event: "Token reauthorization successful", status: "success"},
                     ...acc.syncLogs,
                 ],
             }
@@ -95,10 +96,16 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
         })
     }
 
-    const handleDisconnect = (accountId: string) => {
-        if (confirm("Disconnect this account? You will lose auto-sync capability.")) {
+    const handleDisconnect = async (accountId: string) => {
+        if (!confirm("Disconnect this account? You will lose auto-sync capability.")) return
+        try {
+            await DisconnectAccount() // passing unique clerkId to delete the connected account
             setAccounts(prev => prev.filter(acc => acc.id !== accountId))
             if (selectedAccount?.id === accountId) setSelectedAccount(null)
+            toast.success("Account disconnected successfully.")
+        } catch (e) {
+            console.log("Failed to disconnect account: ", e)
+            toast.error("Failed to disconnect account. Please try again later.")
         }
     }
 
@@ -106,20 +113,20 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
         setRefreshing(true)
         setTimeout(() => {
             setRefreshing(false)
-            setAccounts(prev => prev.map(acc => ({ ...acc, lastSync: "Just now" })))
+            setAccounts(prev => prev.map(acc => ({...acc, lastSync: "Just now"})))
         }, 1000)
     }
 
     // ── Merging and Filtering ──────────────────────────────────────────────────
 
     const mergedItems = useMemo(() => {
-        const items: AccountCardItem[] = accounts.map(acc => ({ type: "connected" as const, account: acc }))
+        const items: AccountCardItem[] = accounts.map(acc => ({type: "connected" as const, account: acc}))
 
         // For each provider in PROVIDERS_CONFIG, if there are NO connected accounts for it, add an unconnected item.
         Object.values(PROVIDERS_CONFIG).forEach(provider => {
             const hasConnected = accounts.some(acc => acc.platform.toLowerCase() === provider.key.toLowerCase())
             if (!hasConnected) {
-                items.push({ type: "unconnected" as const, provider })
+                items.push({type: "unconnected" as const, provider})
             }
         })
 
@@ -181,16 +188,17 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
 
     // ── Computed stats ────────────────────────────────────────────────────────
 
-    const connectedCount  = accounts.filter(a => a.connectedStatus === "connected").length
-    const healthyCount    = accounts.filter(a => a.healthStatus === "excellent" || a.healthStatus === "good").length
-    const attentionCount  = accounts.filter(a => a.healthStatus === "warning"   || a.healthStatus === "error").length
-    const healthScore     = attentionCount > 0 ? "warning" : "excellent"
+    const connectedCount = accounts.filter(a => a.connectedStatus === "connected").length
+    const healthyCount = accounts.filter(a => a.healthStatus === "excellent" || a.healthStatus === "good").length
+    const attentionCount = accounts.filter(a => a.healthStatus === "warning" || a.healthStatus === "error").length
+    const healthScore = attentionCount > 0 ? "warning" : "excellent"
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
 
             {/* ── Page Header ───────────────────────────────────────────────── */}
-            <header className="shrink-0 border-b border-border bg-card/80 backdrop-blur-sm px-5 py-4 flex items-center justify-between gap-3">
+            <header
+                className="shrink-0 border-b border-border bg-card/80 backdrop-blur-sm px-5 py-4 flex items-center justify-between gap-3">
                 <div>
                     <h1 className="text-base font-bold text-foreground tracking-tight">Connected Accounts</h1>
                     <p className="text-[11px] text-muted-foreground hidden sm:block">
@@ -204,14 +212,14 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
                         disabled={refreshing}
                         className="inline-flex items-center gap-1.5 h-8 px-3 rounded-xl border border-border bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-semibold transition-all disabled:opacity-50"
                     >
-                        <RefreshCcw size={12} className={refreshing ? "animate-spin" : ""} />
+                        <RefreshCcw size={12} className={refreshing ? "animate-spin" : ""}/>
                         <span className="hidden sm:inline">Refresh All</span>
                     </button>
                     <button
                         onClick={() => setIsDialogOpen(true)}
                         className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/95 transition-all shadow-sm"
                     >
-                        <Plus size={13} />
+                        <Plus size={13}/>
                         Connect Account
                     </button>
                 </div>
@@ -222,7 +230,7 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
                 <div className="p-5 sm:p-6 space-y-6 max-w-screen-2xl mx-auto">
 
                     {/* Monitoring panel — collapsible, separated from accounts */}
-                    <MonitoringPanel healthScore={healthScore} />
+                    <MonitoringPanel healthScore={healthScore}/>
 
                     {/* Overview stats */}
                     <OverviewCards
@@ -246,12 +254,14 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
 
                     {/* Account grid — always full width */}
                     {filteredItems.length === 0 ? (
-                        <EmptyState onConnectClick={() => setIsDialogOpen(true)} />
+                        <EmptyState onConnectClick={() => setIsDialogOpen(true)}/>
                     ) : (
                         <ConnectedAccountsList
                             items={filteredItems}
                             onSelectAccount={setSelectedAccount}
-                            onOpenLogs={(acc) => { setSelectedAccount(acc) }}
+                            onOpenLogs={(acc) => {
+                                setSelectedAccount(acc)
+                            }}
                             onReconnect={handleReconnect}
                             onDisconnect={handleDisconnect}
                             onConnectPlatform={(oauthPath) => {
@@ -265,7 +275,7 @@ export function ConnectedAccountsPage({ initialAccounts }: ConnectedAccountsPage
                     )}
 
                     {/* Bottom breathing room */}
-                    <div className="h-8" />
+                    <div className="h-8"/>
                 </div>
             </div>
 
