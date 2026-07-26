@@ -1,14 +1,36 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { MoreHorizontal, RefreshCcw, Trash2, Database } from "lucide-react"
-import { toast } from "sonner"
-import type { Account } from "../data/mockData"
-import type { ProviderConfig } from "../data/providersConfig"
-import { PlatformIcon } from "@/app/Components/dashboard/PlatformIcons"
-import { cn } from "@/lib/utils"
+import {useState, useEffect, useRef} from "react"
+import {MoreHorizontal, RefreshCcw, Trash2, Database} from "lucide-react"
+import {toast} from "sonner"
+import type {Account} from "../data/mockData"
+import type {ProviderConfig} from "../data/providersConfig"
+import {PlatformIcon} from "@/app/Components/dashboard/PlatformIcons"
+import {cn} from "@/lib/utils"
+import {cookies} from 'next/headers';
+import {prisma} from "@repo/database/src/index";
 
-export type AccountCardItem = 
+
+async function ConnectedAccountList() {
+    const cookieStore = await cookies();
+    const Omnipostuser = cookieStore.get('omnipost_user')
+    if(!Omnipostuser) return (
+        <div className="flex items-center justify-center h-full">
+            <p className="text-muted-foreground text-sm">No user found</p>
+        </div>
+    )
+    const user = JSON.parse(Omnipostuser?.value)
+    const connectedAccounts = prisma.accounts.findMany({
+        where: {
+            userID: user.clerkId,
+            expiresAt: {
+                gt: new Date(),
+            }
+        }
+    });
+}
+
+export type AccountCardItem =
     | { type: "connected"; account: Account }
     | { type: "unconnected"; provider: ProviderConfig }
 
@@ -24,11 +46,11 @@ interface ConnectedAccountsListProps {
 // ─── Card Action Menu ─────────────────────────────────────────────────────────
 
 function CardActionMenu({
-    account,
-    onReconnect,
-    onDisconnect,
-    onOpenLogs,
-}: {
+                            account,
+                            onReconnect,
+                            onDisconnect,
+                            onOpenLogs,
+                        }: {
     account: Account
     onReconnect: (id: string) => void
     onDisconnect: (id: string) => void
@@ -43,6 +65,7 @@ function CardActionMenu({
                 setOpen(false)
             }
         }
+
         document.addEventListener("mousedown", handleClickOutside)
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
@@ -55,34 +78,44 @@ function CardActionMenu({
                 className="w-7 h-7 rounded-lg flex items-center justify-center border border-border/60 bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-all shrink-0"
                 aria-label="Account actions"
             >
-                <MoreHorizontal size={14} />
+                <MoreHorizontal size={14}/>
             </button>
 
             {open && (
-                <div className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-border/80 bg-popover text-popover-foreground shadow-xl p-1 animate-in fade-in slide-in-from-top-1 duration-150">
+                <div
+                    className="absolute right-0 top-8 z-30 w-44 rounded-xl border border-border/80 bg-popover text-popover-foreground shadow-xl p-1 animate-in fade-in slide-in-from-top-1 duration-150">
                     <button
                         type="button"
-                        onClick={() => { onReconnect(account.id); setOpen(false) }}
+                        onClick={() => {
+                            onReconnect(account.id);
+                            setOpen(false)
+                        }}
                         className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs hover:bg-accent hover:text-accent-foreground text-left transition-colors font-medium text-foreground"
                     >
-                        <RefreshCcw size={12} className="text-muted-foreground" />
+                        <RefreshCcw size={12} className="text-muted-foreground"/>
                         Reconnect
                     </button>
                     <button
                         type="button"
-                        onClick={() => { onOpenLogs(account); setOpen(false) }}
+                        onClick={() => {
+                            onOpenLogs(account);
+                            setOpen(false)
+                        }}
                         className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs hover:bg-accent hover:text-accent-foreground text-left transition-colors font-medium text-foreground"
                     >
-                        <Database size={12} className="text-muted-foreground" />
+                        <Database size={12} className="text-muted-foreground"/>
                         View Logs
                     </button>
-                    <div className="h-px bg-border/40 my-1" />
+                    <div className="h-px bg-border/40 my-1"/>
                     <button
                         type="button"
-                        onClick={() => { onDisconnect(account.id); setOpen(false) }}
+                        onClick={() => {
+                            onDisconnect(account.id);
+                            setOpen(false)
+                        }}
                         className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs hover:bg-red-500/10 text-red-500 text-left transition-colors font-medium"
                     >
-                        <Trash2 size={12} className="text-red-500/70" />
+                        <Trash2 size={12} className="text-red-500/70"/>
                         Disconnect
                     </button>
                 </div>
@@ -95,32 +128,32 @@ function CardActionMenu({
 
 function getStatusPill(account: Account) {
     if (account.connectedStatus === "disconnected") {
-        return { label: "Disconnected", style: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20" }
+        return {label: "Disconnected", style: "bg-zinc-500/10 text-zinc-500 border-zinc-500/20"}
     }
     if (account.healthStatus === "error") {
-        return { label: "Failed", style: "bg-red-500/10 text-red-500 border-red-500/20" }
+        return {label: "Failed", style: "bg-red-500/10 text-red-500 border-red-500/20"}
     }
     if (account.healthStatus === "warning") {
-        return { label: "Needs Reauth", style: "bg-amber-500/10 text-amber-500 border-amber-500/20" }
+        return {label: "Needs Reauth", style: "bg-amber-500/10 text-amber-500 border-amber-500/20"}
     }
-    return { label: "Connected", style: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" }
+    return {label: "Connected", style: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"}
 }
 
 // ─── ConnectedAccountsList ────────────────────────────────────────────────────
 
 export function ConnectedAccountsList({
-    items,
-    onSelectAccount,
-    onOpenLogs,
-    onReconnect,
-    onDisconnect,
-    onConnectPlatform,
-}: ConnectedAccountsListProps) {
+                                          items,
+                                          onSelectAccount,
+                                          onOpenLogs,
+                                          onReconnect,
+                                          onDisconnect,
+                                          onConnectPlatform,
+                                      }: ConnectedAccountsListProps) {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {items.map((item) => {
                 if (item.type === "unconnected") {
-                    const { provider } = item
+                    const {provider} = item
                     return (
                         <div
                             key={`unconnected-${provider.key}`}
@@ -133,10 +166,11 @@ export function ConnectedAccountsList({
                             {/* Top row: Platform Icon + Not Connected badge */}
                             <div className="flex items-start justify-between gap-2">
                                 <div className="relative shrink-0">
-                                    {provider.icon({ size: 44, className: "rounded-xl" })}
+                                    {provider.icon({size: 44, className: "rounded-xl"})}
                                 </div>
 
-                                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 bg-zinc-500/10 text-zinc-500 border-zinc-500/20">
+                                <span
+                                    className="text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 mt-0.5 bg-zinc-500/10 text-zinc-500 border-zinc-500/20">
                                     Not Connected
                                 </span>
                             </div>
@@ -175,7 +209,7 @@ export function ConnectedAccountsList({
                     )
                 }
 
-                const { account } = item
+                const {account} = item
                 const statusPill = getStatusPill(account)
 
                 return (
@@ -199,7 +233,7 @@ export function ConnectedAccountsList({
                                     className="w-11 h-11 rounded-full object-cover ring-2 ring-border/40 bg-muted"
                                 />
                                 <div className="absolute -bottom-1 -right-1">
-                                    <PlatformIcon name={account.platform} size={18} className="shadow-md rounded-md" />
+                                    <PlatformIcon name={account.platform} size={18} className="shadow-md rounded-md"/>
                                 </div>
                             </div>
 
