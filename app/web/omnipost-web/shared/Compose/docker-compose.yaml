@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - 5432:5432
+    container_name: postgres_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - Omnipost-network
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_DB: ${PG_DB}
+
+  s3:
+    image: quay.io/minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    container_name: s3_server
+    expose:
+      - 9000
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USERNAME}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - Omnipost-network
+    volumes:
+      - s3-data:/data
+    command: server /data --console-address ":9001"
+    
+volumes:
+  db-data:
+  s3-data:
+
+networks:
+  Omnipost-network:
+    driver: bridge
