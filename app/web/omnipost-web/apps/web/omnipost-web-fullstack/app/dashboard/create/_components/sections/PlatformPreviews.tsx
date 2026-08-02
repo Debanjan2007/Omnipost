@@ -48,7 +48,7 @@ function truncate(text: string, n: number) {
 
 function InstagramPreview({ content, file }: { content: string; file?: MediaFile }) {
     return (
-        <div className="max-w-[375px] mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="max-w-93.75 mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2.5">
                 <div className="flex items-center gap-2.5">
@@ -74,7 +74,7 @@ function InstagramPreview({ content, file }: { content: string; file?: MediaFile
                 </div>
                 <p className="text-[11px] font-bold text-foreground">1,284 likes</p>
                 <div>
-                    <p className="text-[11px] text-foreground leading-relaxed">
+                    <p className="text-[11px] whitespace-pre-wrap text-foreground leading-relaxed">
                         <span className="font-bold">omnipost</span>{" "}
                         {content ? truncate(content, 180) : <span className="text-muted-foreground italic">Your caption will appear here…</span>}
                     </p>
@@ -88,18 +88,18 @@ function InstagramPreview({ content, file }: { content: string; file?: MediaFile
 
 function TwitterPreview({ content }: { content: string }) {
     return (
-        <div className="max-w-[375px] mx-auto bg-background border border-border rounded-2xl p-4 shadow-sm">
+        <div className="max-w-93.75 mx-auto bg-background border border-border rounded-2xl p-4 shadow-sm">
             <div className="flex gap-3">
                 <Avatar size={40}/>
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="text-sm font-bold text-foreground">Debanjan</p>
-                        <svg viewBox="0 0 24 24" className="w-4 h-4 text-[var(--color-brand-bluesky)] fill-current shrink-0">
+                        <svg viewBox="0 0 24 24" className="w-4 h-4 text-(--color-brand-bluesky) fill-current shrink-0">
                             <path d="M8.52 3.59A10 10 0 0122 12a10 10 0 01-13.48 9.34L8 22l-.53-3a7.5 7.5 0 01-3.62-6.64A7.48 7.48 0 018.52 3.59z" opacity=".3"/><path d="M10.12 7.5l1.88 4.03 4.35-4.87L17.5 8.5l-5.5 6-3-6.38L10.12 7.5zM8.5 5a7.5 7.5 0 100 15 7.5 7.5 0 000-15z"/>
                         </svg>
                         <p className="text-[11px] text-muted-foreground">@debanjan_ · 2h</p>
                     </div>
-                    <p className="text-sm text-foreground mt-1.5 leading-relaxed">
+                    <p className="text-sm text-foreground whitespace-pre-wrap mt-1.5 leading-relaxed">
                         {content
                             ? truncate(content, 280)
                             : <span className="text-muted-foreground italic text-xs">Your tweet will appear here…</span>
@@ -109,7 +109,7 @@ function TwitterPreview({ content }: { content: string }) {
                         <button className="flex items-center gap-1.5 hover:text-primary transition-colors">
                             <MessageCircle size={14}/><span className="text-xs">45</span>
                         </button>
-                        <button className="flex items-center gap-1.5 hover:text-[var(--color-success)] transition-colors">
+                        <button className="flex items-center gap-1.5 hover:text-(--color-success) transition-colors">
                             <Repeat2 size={14}/><span className="text-xs">128</span>
                         </button>
                         <button className="flex items-center gap-1.5 hover:text-red-500 transition-colors">
@@ -127,7 +127,7 @@ function TwitterPreview({ content }: { content: string }) {
 
 function LinkedInPreview({ content }: { content: string }) {
     return (
-        <div className="max-w-[375px] mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="max-w-93.75 mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4">
                 <div className="flex items-start gap-3">
                     <Avatar size={44}/>
@@ -141,7 +141,7 @@ function LinkedInPreview({ content }: { content: string }) {
                     </button>
                 </div>
                 <div className="mt-3">
-                    <p className="text-sm text-foreground leading-relaxed">
+                    <p className="text-sm whitespace-pre-wrap text-foreground leading-relaxed">
                         {content
                             ? truncate(content, 300)
                             : <span className="text-muted-foreground italic">Your LinkedIn post will appear here…</span>
@@ -169,7 +169,7 @@ function LinkedInPreview({ content }: { content: string }) {
 
 function FacebookPreview({ content, file }: { content: string; file?: MediaFile }) {
     return (
-        <div className="max-w-[375px] mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="max-w-93.75 mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="p-4 space-y-3">
                 <div className="flex items-center gap-3">
                     <Avatar size={36}/>
@@ -179,7 +179,7 @@ function FacebookPreview({ content, file }: { content: string; file?: MediaFile 
                     </div>
                     <MoreHorizontal size={16} className="text-muted-foreground"/>
                 </div>
-                <p className="text-sm text-foreground leading-relaxed">
+                <p className="text-sm whitespace-pre-wrap text-foreground leading-relaxed">
                     {content
                         ? truncate(content, 300)
                         : <span className="text-muted-foreground italic">Your Facebook post will appear here…</span>
@@ -206,7 +206,7 @@ function FacebookPreview({ content, file }: { content: string; file?: MediaFile 
 
 function ThreadsPreview({ content }: { content: string }) {
     return (
-        <div className="max-w-[375px] mx-auto bg-background border border-border rounded-2xl p-4 shadow-sm">
+        <div className="max-w-93.75 mx-auto bg-background border border-border rounded-2xl p-4 shadow-sm">
             <div className="flex gap-3">
                 <Avatar size={36}/>
                 <div className="flex-1 min-w-0">
@@ -217,7 +217,7 @@ function ThreadsPreview({ content }: { content: string }) {
                             <MoreHorizontal size={15}/>
                         </div>
                     </div>
-                    <p className="text-sm text-foreground mt-1.5 leading-relaxed">
+                    <p className="text-sm whitespace-pre-wrap text-foreground mt-1.5 leading-relaxed">
                         {content
                             ? truncate(content, 500)
                             : <span className="text-muted-foreground italic text-xs">Your Threads post will appear here…</span>
@@ -226,7 +226,7 @@ function ThreadsPreview({ content }: { content: string }) {
                     <div className="flex items-center gap-4 mt-3 text-muted-foreground">
                         <button className="flex items-center gap-1 hover:text-red-500 transition-colors"><Heart size={16}/></button>
                         <button className="flex items-center gap-1 hover:text-primary transition-colors"><MessageCircle size={16}/></button>
-                        <button className="flex items-center gap-1 hover:text-[var(--color-success)] transition-colors"><Repeat2 size={16}/></button>
+                        <button className="flex items-center gap-1 hover:text-(--color-success) transition-colors"><Repeat2 size={16}/></button>
                         <button className="flex items-center gap-1 hover:text-primary transition-colors"><Send size={16}/></button>
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-2">234 likes</p>
@@ -238,10 +238,10 @@ function ThreadsPreview({ content }: { content: string }) {
 
 function YouTubePreview({ content, file }: { content: string; file?: MediaFile }) {
     return (
-        <div className="max-w-[375px] mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="max-w-93.75 mx-auto bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
             <MediaPlaceholder file={file} className="aspect-video"/>
             <div className="p-4 space-y-2.5">
-                <p className="text-sm font-semibold text-foreground leading-snug">
+                <p className="text-sm whitespace-pre-wrap font-semibold text-foreground leading-snug">
                     {content ? truncate(content, 100) : <span className="text-muted-foreground italic">Your video title will appear here…</span>}
                 </p>
                 <div className="flex items-center gap-2">
