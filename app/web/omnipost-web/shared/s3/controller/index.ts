@@ -4,15 +4,16 @@ import { bucketExists } from './utils/Bucketexists.utils.s3'
 
 export const createBucket = async (bucketName: string) => {
     const bucket = await bucketExists(bucketName)
-    if(!bucket){
+    if(bucket){
         console.log('Bucket already exists')
         return
     }
     const command = new CreateBucketCommand({ Bucket: bucketName })
     await s3.send(command)
+    console.log('Bucket created')
 }
 
-export const puObject = async (bucket: string , key: string , body: any) => {
+export const putObject = async (bucket: string , key: string , body: any) => {
     try{
         const command = new PutObjectCommand({
             Bucket: bucket,
@@ -20,9 +21,16 @@ export const puObject = async (bucket: string , key: string , body: any) => {
             Body: body,
         })
         await s3.send(command)
+        return {
+            success: true,
+            status: 200
+        }
     }catch (e: any) {{
         console.log(e)
-        throw new Error(e.message)
+        return {
+            success: false,
+            status: 500
+        }
     }}
 }
 
