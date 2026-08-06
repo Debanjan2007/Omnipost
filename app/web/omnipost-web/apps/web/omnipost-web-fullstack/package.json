@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@repo/s3": "*",
     "@auth0/auth0-react": "^2.20.0",
     "@base-ui/react": "^1.6.0",
     "@clerk/nextjs": "^7.5.13",
