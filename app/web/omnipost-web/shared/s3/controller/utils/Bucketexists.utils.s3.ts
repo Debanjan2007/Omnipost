@@ -1,5 +1,5 @@
 import {HeadBucketCommand} from '@aws-sdk/client-s3'
-import { s3 } from "../connect.s3.js"
+import { s3 } from "../connect.s3"
 
 export const bucketExists = async (bucketName: string): Promise<boolean> => {
     try {

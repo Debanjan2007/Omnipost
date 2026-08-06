@@ -1,6 +1,6 @@
-import { s3 } from './connect.s3.js'
+import { s3 } from './connect.s3'
 import { CreateBucketCommand , PutObjectCommand , GetObjectCommand , DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { bucketExists } from './utils/Bucketexists.utils.s3.js'
+import { bucketExists } from './utils/Bucketexists.utils.s3'
 
 export const createBucket = async (bucketName: string) => {
     const bucket = await bucketExists(bucketName)
@@ -52,4 +52,4 @@ export const delObject = async (bucket: string , key: string) => {
     }
 }
 
-export * from './utils/Bucketexists.utils.s3.js'
+export * from './utils/Bucketexists.utils.s3'
