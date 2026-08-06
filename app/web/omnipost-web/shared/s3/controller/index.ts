@@ -1,12 +1,18 @@
 import { s3 } from './connect.s3.js'
 import { CreateBucketCommand , PutObjectCommand , GetObjectCommand , DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { bucketExists } from './utils/Bucketexists.utils.s3.js'
 
-const createBucket = async (bucketName: string) => {
+export const createBucket = async (bucketName: string) => {
+    const bucket = await bucketExists(bucketName)
+    if(!bucket){
+        console.log('Bucket already exists')
+        return
+    }
     const command = new CreateBucketCommand({ Bucket: bucketName })
     await s3.send(command)
 }
 
-const puObject = async (bucket: string , key: string , body: any) => {
+export const puObject = async (bucket: string , key: string , body: any) => {
     try{
         const command = new PutObjectCommand({
             Bucket: bucket,
@@ -20,7 +26,7 @@ const puObject = async (bucket: string , key: string , body: any) => {
     }}
 }
 
-const getObject = async (bucket: string , key: string) => {
+export const getObject = async (bucket: string , key: string) => {
     try{
         const command = new GetObjectCommand({
             Bucket: bucket,
@@ -33,7 +39,7 @@ const getObject = async (bucket: string , key: string) => {
     }
 }
 
-const delObject = async (bucket: string , key: string) => {
+export const delObject = async (bucket: string , key: string) => {
     try{
         const command = new DeleteObjectCommand({
             Bucket: bucket,
@@ -46,9 +52,4 @@ const delObject = async (bucket: string , key: string) => {
     }
 }
 
-export {
-    createBucket,
-    puObject,
-    getObject
-}
 export * from './utils/Bucketexists.utils.s3.js'
