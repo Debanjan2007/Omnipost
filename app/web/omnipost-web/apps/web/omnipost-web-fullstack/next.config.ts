@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/database"],
+  transpilePackages: ["@repo/database", "@repo/s3"],
   images: {
     remotePatterns: [
       {

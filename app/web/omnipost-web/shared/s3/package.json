@@ -1,15 +1,16 @@
 {
-  "name": "s3",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "@repo/s3",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
+  "peerDependencies": {
+    "typescript": "^5"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0"
   }

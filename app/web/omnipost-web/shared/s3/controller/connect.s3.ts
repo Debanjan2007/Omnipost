@@ -1,8 +1,8 @@
 import {S3Client} from '@aws-sdk/client-s3'
 
 
-let s3: any = undefined;
-const connectS3 = async () => {
+export let s3: any = undefined;
+export const connectS3 = async () => {
     s3 = new S3Client({
         endpoint: process.env.MINIO_ENDPOINT as string,
         region: process.env.MINIO_REGION as string,
@@ -13,10 +13,5 @@ const connectS3 = async () => {
         forcePathStyle: true,
         requestChecksumCalculation: "WHEN_REQUIRED",
     })
-}
-
-
-export {
-    connectS3,
-    s3
+    return s3
 }

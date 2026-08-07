@@ -47,6 +47,8 @@ export const TOAST_EVENTS = {
     database_error: "database_error",
     unauthorized: "unauthorized",
     unknown_error: "unknown_error",
+    upload_failed: "upload_failed",
+
 } as const
 
 export type ToastEventId = (typeof TOAST_EVENTS)[keyof typeof TOAST_EVENTS]
@@ -112,6 +114,11 @@ export const toastRegistry: Record<ToastEventId, ToastDefinition> = {
         title: "Unknown Error",
         description: "An unexpected error occurred. Please try again.",
     },
+    upload_failed: {
+        variant: "error",
+        title: "Upload Failed",
+        description: "Your file could not be uploaded. Please try again.",
+    }
 }
 
 // ---------------------------------------------------------------------------

@@ -80,6 +80,7 @@ export function PostComposer({ content, setContent, savedStatus }: PostComposerP
 
     function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
         const val = e.target.value
+        console.log("handleChange", val)
         setContent(val)
         pushHistory(val)
     }
@@ -143,7 +144,7 @@ export function PostComposer({ content, setContent, savedStatus }: PostComposerP
                         </span>
                     )}
                     {savedStatus === "saved" && (
-                        <span className="flex items-center gap-1 text-[var(--color-success)]">
+                        <span className="flex items-center gap-1 text-(--color-success)">
                             <Check size={11}/> Saved
                         </span>
                     )}
@@ -171,10 +172,10 @@ export function PostComposer({ content, setContent, savedStatus }: PostComposerP
                 </div>
                 <div className={cn(
                     "text-[11px] font-medium tabular-nums",
-                    twitterWarn ? "text-[var(--color-warning)]" : "text-muted-foreground",
+                    twitterWarn ? "text-(--color-warning)" : "text-muted-foreground",
                 )}>
                     {charCount.toLocaleString()}
-                    {twitterWarn && <span className="ml-1 text-[var(--color-warning)]">· near X limit (280)</span>}
+                    {twitterWarn && <span className="ml-1 text-(--color-warning)">· near X limit (280)</span>}
                 </div>
             </div>
         </div>

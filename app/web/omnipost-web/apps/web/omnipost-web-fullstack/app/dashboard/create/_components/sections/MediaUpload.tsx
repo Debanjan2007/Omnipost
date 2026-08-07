@@ -1,23 +1,24 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
-import { Upload, Image, Film, FileText, Sticker, X, Crop, Type, RotateCcw } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { ImageCropper } from "../ui/ImageCropper"
+import {useState, useRef, useCallback, useEffect} from "react"
+import {Upload, Image, Film, FileText, Sticker, X, Crop, Type, RotateCcw} from "lucide-react"
+import {cn} from "@/lib/utils"
+import {ImageCropper} from "../ui/ImageCropper"
+import {toast} from "sonner";
 
 export interface MediaFile {
-    id:      string
-    name:    string
-    type:    "image" | "video" | "gif" | "document"
-    url:     string
+    id: string
+    name: string
+    type: "image" | "video" | "gif" | "document"
+    url: string
     altText: string
-    size:    number
+    size: number
 }
 
 const TYPE_ICONS = {
-    image:    <Image    size={20} className="text-[var(--color-info)]"/>,
-    video:    <Film     size={20} className="text-[var(--color-brand-youtube)]"/>,
-    gif:      <Sticker  size={20} className="text-[var(--color-success)]"/>,
+    image: <Image size={20} className="text-[var(--color-info)]"/>,
+    video: <Film size={20} className="text-[var(--color-brand-youtube)]"/>,
+    gif: <Sticker size={20} className="text-[var(--color-success)]"/>,
     document: <FileText size={20} className="text-muted-foreground"/>,
 }
 
@@ -28,7 +29,7 @@ function formatSize(bytes: number) {
 }
 
 interface MediaUploadProps {
-    files:    MediaFile[]
+    files: MediaFile[]
     setFiles: (f: MediaFile[]) => void
 }
 
@@ -36,26 +37,57 @@ interface MediaUploadProps {
  * MediaUpload — drag & drop zone + thumbnail grid.
  * Simulates upload from dropped files (creates object URLs).
  */
-export function MediaUpload({ files, setFiles }: MediaUploadProps) {
+export function MediaUpload({files, setFiles}: MediaUploadProps) {
     const [dragging, setDragging] = useState(false)
+    const [file, setFile] = useState<File | null | undefined>(null)
     const [altTarget, setAltTarget] = useState<string | null>(null)
     const [cropTarget, setCropTarget] = useState<MediaFile | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
 
     const addFiles = useCallback((incoming: File[]) => {
         const mapped: MediaFile[] = incoming.map(f => ({
-            id:      crypto.randomUUID(),
-            name:    f.name,
-            type:    f.type.startsWith("video") ? "video"
-                   : f.type === "image/gif" ? "gif"
-                   : f.type.startsWith("image") ? "image"
-                   : "document",
-            url:     URL.createObjectURL(f),
+            id: crypto.randomUUID(),
+            name: f.name,
+            type: f.type.startsWith("video") ? "video"
+                : f.type === "image/gif" ? "gif"
+                    : f.type.startsWith("image") ? "image"
+                        : "document",
+            url: URL.createObjectURL(f),
             altText: "",
-            size:    f.size,
+            size: f.size,
         }))
         setFiles([...files, ...mapped])
     }, [files, setFiles])
+
+    function uploadtoS3(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        fetch('/api/s3/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then((res) => {
+                console.log(res)
+            })
+            .catch((e => {
+                console.error('Error uploading file:', e);
+                toast.error(
+                    "Error uploading file",
+                    {
+                        description: "There was an error uploading your file. Please try again.",
+                    }
+                )
+            }))
+    }
+    useEffect(() => {
+        uploadtoS3(file as File);
+        toast.success(
+            "File uploaded successfully",
+            {
+                description: "Your file is being processed and will be available soon.",
+            }
+        )
+    }, [file])
 
     function onDrop(e: React.DragEvent) {
         e.preventDefault()
@@ -66,14 +98,15 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
     function remove(id: string) {
         setFiles(files.filter(f => f.id !== id))
     }
+
     function updateAlt(id: string, text: string) {
-        setFiles(files.map(f => f.id === id ? { ...f, altText: text } : f))
+        setFiles(files.map(f => f.id === id ? {...f, altText: text} : f))
     }
 
     const handleSaveCrop = (croppedUrl: string) => {
         if (!cropTarget) return
         setFiles(
-            files.map(f => f.id === cropTarget.id ? { ...f, url: croppedUrl } : f)
+            files.map(f => f.id === cropTarget.id ? {...f, url: croppedUrl} : f)
         )
         setCropTarget(null)
     }
@@ -90,7 +123,10 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
 
             {/* Drop zone */}
             <div
-                onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                onDragOver={e => {
+                    e.preventDefault();
+                    setDragging(true)
+                }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={onDrop}
                 onClick={() => inputRef.current?.click()}
@@ -115,37 +151,49 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
                 {/* Type badges */}
                 <div className="flex items-center gap-2">
                     {(["image", "video", "gif", "document"] as const).map(t => (
-                        <span key={t} className="flex items-center gap-1 px-2 py-0.5 bg-muted rounded-full text-[10px] text-muted-foreground font-medium">
+                        <span key={t}
+                              className="flex items-center gap-1 px-2 py-0.5 bg-muted rounded-full text-[10px] text-muted-foreground font-medium">
                             {TYPE_ICONS[t]}
                             <span className="capitalize">{t}</span>
                         </span>
                     ))}
                 </div>
                 <input ref={inputRef} type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx" className="hidden"
-                    onChange={e => addFiles(Array.from(e.target.files ?? []))}/>
+                       onChange={ async (e) => {
+                           e.preventDefault();
+                           setFile(e.target.files?.[0])
+                           addFiles(Array.from(e.target.files ?? []))
+                       }
+                       }/>
             </div>
 
             {/* Thumbnails */}
             {files.length > 0 && (
                 <div className="px-4 pb-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2.5">
                     {files.map(f => (
-                        <div key={f.id} className="relative group rounded-xl border border-border overflow-hidden bg-muted/30">
+                        <div key={f.id}
+                             className="relative group rounded-xl border border-border overflow-hidden bg-muted/30">
                             {/* Preview */}
                             {f.type === "image" || f.type === "gif" ? (
                                 // eslint-disable-next-line @next/next/no-img-element
-                                <img src={f.url} alt={f.altText || f.name} className="w-full aspect-square object-cover"/>
+                                <img src={f.url} alt={f.altText || f.name}
+                                     className="w-full aspect-square object-cover"/>
                             ) : (
-                                <div className="w-full aspect-square flex flex-col items-center justify-center gap-1.5 p-2">
+                                <div
+                                    className="w-full aspect-square flex flex-col items-center justify-center gap-1.5 p-2">
                                     {TYPE_ICONS[f.type]}
-                                    <span className="text-[10px] text-muted-foreground truncate max-w-full px-1">{f.name}</span>
+                                    <span
+                                        className="text-[10px] text-muted-foreground truncate max-w-full px-1">{f.name}</span>
                                     <span className="text-[10px] text-muted-foreground/60">{formatSize(f.size)}</span>
                                 </div>
                             )}
 
                             {/* Hover overlay */}
-                            <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 rounded-xl">
+                            <div
+                                className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 rounded-xl">
                                 <button onClick={() => setAltTarget(altTarget === f.id ? null : f.id)}
-                                    className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors" title="Alt text">
+                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+                                        title="Alt text">
                                     <Type size={12}/>
                                 </button>
                                 {f.type === "image" && (
@@ -157,11 +205,14 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
                                         <Crop size={12}/>
                                     </button>
                                 )}
-                                <button className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors" title="Replace">
+                                <button
+                                    className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+                                    title="Replace">
                                     <RotateCcw size={12}/>
                                 </button>
                                 <button onClick={() => remove(f.id)}
-                                    className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 text-destructive transition-colors" title="Delete">
+                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 text-destructive transition-colors"
+                                        title="Delete">
                                     <X size={12}/>
                                 </button>
                             </div>
@@ -182,7 +233,9 @@ export function MediaUpload({ files, setFiles }: MediaUploadProps) {
                             onChange={e => updateAlt(altTarget, e.target.value)}
                             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none"
                         />
-                        <button onClick={() => setAltTarget(null)} className="shrink-0"><X size={13} className="text-muted-foreground"/></button>
+                        <button onClick={() => setAltTarget(null)} className="shrink-0"><X size={13}
+                                                                                           className="text-muted-foreground"/>
+                        </button>
                     </div>
                 </div>
             )}

@@ -1,2 +1,2 @@
-export * from './controller/index.js'
-export * from './controller/connect.s3.js'
+export * from './controller/index'
+export * from './controller/connect.s3'
