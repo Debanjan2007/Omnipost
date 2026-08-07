@@ -60,34 +60,43 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
     }, [files, setFiles])
 
     function uploadtoS3(file: File) {
+        if (!file) return;
+
         const formData = new FormData();
-        formData.append('file', file);
-        fetch('/api/s3/upload', {
-            method: 'POST',
-            body: formData
+        formData.append("file", file);
+
+        fetch("/api/s3/upload", {
+            method: "POST",
+            body: formData,
         })
-            .then((res) => {
-                console.log(res)
+            .then(async (res) => {
+                const data = await res.json().catch(() => null);
+
+                if (!res.ok) {
+                    throw new Error(data?.message || "Failed to upload file");
+                }
+
+                console.log("Upload response:", data);
+
+                toast.success("File uploaded successfully", {
+                    description: "Your file has been uploaded successfully.",
+                });
+
+                return data;
             })
-            .catch((e => {
-                console.error('Error uploading file:', e);
-                toast.error(
-                    "Error uploading file",
-                    {
-                        description: "There was an error uploading your file. Please try again.",
-                    }
-                )
-            }))
+            .catch((e) => {
+                console.error("Error uploading file:", e);
+
+                toast.error("Error uploading file", {
+                    description: e.message || "There was an error uploading your file. Please try again.",
+                });
+            });
     }
     useEffect(() => {
-        uploadtoS3(file as File);
-        toast.success(
-            "File uploaded successfully",
-            {
-                description: "Your file is being processed and will be available soon.",
-            }
-        )
-    }, [file])
+        if (!file) return;
+
+        uploadtoS3(file);
+    }, [file]);
 
     function onDrop(e: React.DragEvent) {
         e.preventDefault()
