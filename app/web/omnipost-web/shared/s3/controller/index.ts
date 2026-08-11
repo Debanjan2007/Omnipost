@@ -1,5 +1,6 @@
 import { s3 } from './connect.s3'
 import { CreateBucketCommand , PutObjectCommand , GetObjectCommand , DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { bucketExists } from './utils/Bucketexists.utils.s3'
 
 export const createBucket = async (bucketName: string) => {
@@ -57,6 +58,19 @@ export const delObject = async (bucket: string , key: string) => {
     }catch (e: any){
         console.log(e)
         throw new Error(e.message)
+    }
+}
+
+export const PresignedUrl = async (bucketname: string , key: string ) => {
+    try {
+        const command = new GetObjectCommand({
+            Bucket: bucketname,
+            Key: key,
+        });
+        const signedurl = getSignedUrl(s3, command, {expiresIn: 3600}) // the signed url gonna expire within an hour}
+    }catch (e){
+        console.log("Error occured while generating presigned url : ", e)
+        throw new Error("Error while getting presigned URL" , {cause: e})
     }
 }
 
