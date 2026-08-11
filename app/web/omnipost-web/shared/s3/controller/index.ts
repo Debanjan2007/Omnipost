@@ -1,7 +1,7 @@
-import { s3 } from './connect.s3'
-import { CreateBucketCommand , PutObjectCommand , GetObjectCommand , DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { bucketExists } from './utils/Bucketexists.utils.s3'
+import {s3} from './connect.s3'
+import {CreateBucketCommand, DeleteObjectCommand, GetObjectCommand, PutObjectCommand} from '@aws-sdk/client-s3'
+import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
+import {bucketExists} from './utils/Bucketexists.utils.s3'
 
 export const createBucket = async (bucketName: string) => {
     const bucket = await bucketExists(bucketName)
@@ -67,7 +67,8 @@ export const PresignedUrl = async (bucketname: string , key: string ) => {
             Bucket: bucketname,
             Key: key,
         });
-        const signedurl = getSignedUrl(s3, command, {expiresIn: 3600}) // the signed url gonna expire within an hour}
+         // the signed url gonna expire within an hour
+        return getSignedUrl(s3, command, {expiresIn: 3600})
     }catch (e){
         console.log("Error occured while generating presigned url : ", e)
         throw new Error("Error while getting presigned URL" , {cause: e})

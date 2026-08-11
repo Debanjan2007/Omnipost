@@ -1,4 +1,4 @@
-import {connectS3, createBucket, putObject, UniqueKey} from '@repo/s3'
+import {connectS3, createBucket, putObject, UniqueKey , PresignedUrl} from '@repo/s3'
 import {NextRequest, NextResponse} from 'next/server';
 import {TOAST_EVENTS} from "@/lib/toasts";
 
@@ -29,10 +29,12 @@ export async function POST(req: NextRequest) {
                 {status: 500}
             )
         }
+        const signedUrl: string = await PresignedUrl(process.env.S3_BUCKET_NAME as string, key)
         return NextResponse.json({
                 success: true,
                 data: {
-                    key
+                    key: key,
+                    signedUrl : signedUrl
                 },
             },
             {status: 200}

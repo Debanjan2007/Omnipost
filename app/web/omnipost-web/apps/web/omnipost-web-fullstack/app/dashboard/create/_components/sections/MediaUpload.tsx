@@ -59,7 +59,7 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
         setFiles([...files, ...mapped])
     }, [files, setFiles])
 
-    function uploadtoS3(file: File) {
+    function uploadS3(file: File) { // uploads each image to s3 immediately
         if (!file) return;
 
         const formData = new FormData();
@@ -71,9 +71,8 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
         })
             .then(async (res) => {
                 const data = await res.json().catch(() => null);
-
                 if (!res.ok) {
-                    throw new Error(data?.message || "Failed to upload file");
+                    return toast.error("Error uploading file")
                 }
 
                 console.log("Upload response:", data);
@@ -81,7 +80,7 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
                 toast.success("File uploaded successfully", {
                     description: "Your file has been uploaded successfully.",
                 });
-
+                setFile(null);
                 return data;
             })
             .catch((e) => {
@@ -95,7 +94,7 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
     useEffect(() => {
         if (!file) return;
 
-        uploadtoS3(file);
+        uploadS3(file);
     }, [file]);
 
     function onDrop(e: React.DragEvent) {
@@ -167,7 +166,7 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
                         </span>
                     ))}
                 </div>
-                <input ref={inputRef} type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx" className="hidden"
+                <input ref={inputRef} type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx" id="uploadedImage" className="hidden"
                        onChange={ async (e) => {
                            e.preventDefault();
                            setFile(e.target.files?.[0])
