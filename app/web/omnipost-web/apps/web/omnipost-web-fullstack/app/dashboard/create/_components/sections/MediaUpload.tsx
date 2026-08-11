@@ -1,7 +1,7 @@
 "use client"
 
-import {useState, useRef, useCallback, useEffect} from "react"
-import {Upload, Image, Film, FileText, Sticker, X, Crop, Type, RotateCcw} from "lucide-react"
+import {useState, useRef, useCallback} from "react"
+import {Upload, Image, Film, FileText, Sticker, X, Crop, Type, RotateCcw, Loader2} from "lucide-react"
 import {cn} from "@/lib/utils"
 import {ImageCropper} from "../ui/ImageCropper"
 import {toast} from "sonner";
@@ -13,6 +13,9 @@ export interface MediaFile {
     url: string
     altText: string
     size: number
+    s3Key?: string
+    s3Url?: string
+    isUploading?: boolean
 }
 
 const TYPE_ICONS = {
@@ -30,19 +33,59 @@ function formatSize(bytes: number) {
 
 interface MediaUploadProps {
     files: MediaFile[]
-    setFiles: (f: MediaFile[]) => void
+    setFiles: React.Dispatch<React.SetStateAction<MediaFile[]>>
 }
 
 /**
  * MediaUpload — drag & drop zone + thumbnail grid.
- * Simulates upload from dropped files (creates object URLs).
+ * Handles instant client preview and S3 uploads for single/multiple files.
  */
 export function MediaUpload({files, setFiles}: MediaUploadProps) {
     const [dragging, setDragging] = useState(false)
-    const [file, setFile] = useState<File | null | undefined>(null)
     const [altTarget, setAltTarget] = useState<string | null>(null)
     const [cropTarget, setCropTarget] = useState<MediaFile | null>(null)
     const inputRef = useRef<HTMLInputElement>(null)
+
+    const uploadS3File = useCallback((file: File, mediaId: string) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        fetch("/api/s3/upload", {
+            method: "POST",
+            body: formData,
+        })
+            .then(async (res) => {
+                const data = await res.json().catch(() => null);
+                if (!res.ok || !data?.success) {
+                    throw new Error(data?.message || "Failed to upload file");
+                }
+
+                console.log("Upload response:", data);
+
+                toast.success("File uploaded successfully", {
+                    description: `${file.name} has been uploaded.`,
+                });
+
+                // Attach S3 key and signed URL to the file object
+                setFiles(prev => prev.map(f => f.id === mediaId ? {
+                    ...f,
+                    s3Key: data.data.key,
+                    s3Url: data.data.signedUrl,
+                    url: data.data.signedUrl || f.url,
+                    isUploading: false,
+                } : f));
+            })
+            .catch((e) => {
+                console.error("Error uploading file:", e);
+
+                toast.error("Error uploading file", {
+                    description: e.message || `Failed to upload ${file.name}. Removed from list.`,
+                });
+
+                // If S3 upload fails, remove the file from UI
+                setFiles(prev => prev.filter(f => f.id !== mediaId));
+            });
+    }, [setFiles]);
 
     const addFiles = useCallback((incoming: File[]) => {
         const mapped: MediaFile[] = incoming.map(f => ({
@@ -55,66 +98,37 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
             url: URL.createObjectURL(f),
             altText: "",
             size: f.size,
+            isUploading: true,
         }))
-        setFiles([...files, ...mapped])
-    }, [files, setFiles])
 
-    function uploadS3(file: File) { // uploads each image to s3 immediately
-        if (!file) return;
+        setFiles(prev => [...prev, ...mapped]);
 
-        const formData = new FormData();
-        formData.append("file", file);
-
-        fetch("/api/s3/upload", {
-            method: "POST",
-            body: formData,
-        })
-            .then(async (res) => {
-                const data = await res.json().catch(() => null);
-                if (!res.ok) {
-                    return toast.error("Error uploading file")
-                }
-
-                console.log("Upload response:", data);
-
-                toast.success("File uploaded successfully", {
-                    description: "Your file has been uploaded successfully.",
-                });
-                setFile(null);
-                return data;
-            })
-            .catch((e) => {
-                console.error("Error uploading file:", e);
-
-                toast.error("Error uploading file", {
-                    description: e.message || "There was an error uploading your file. Please try again.",
-                });
-            });
-    }
-    useEffect(() => {
-        if (!file) return;
-
-        uploadS3(file);
-    }, [file]);
+        // Upload each file to S3 concurrently
+        incoming.forEach((file, index) => {
+            uploadS3File(file, mapped[index].id);
+        });
+    }, [setFiles, uploadS3File]);
 
     function onDrop(e: React.DragEvent) {
         e.preventDefault()
         setDragging(false)
-        addFiles(Array.from(e.dataTransfer.files))
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            addFiles(Array.from(e.dataTransfer.files))
+        }
     }
 
     function remove(id: string) {
-        setFiles(files.filter(f => f.id !== id))
+        setFiles(prev => prev.filter(f => f.id !== id))
     }
 
     function updateAlt(id: string, text: string) {
-        setFiles(files.map(f => f.id === id ? {...f, altText: text} : f))
+        setFiles(prev => prev.map(f => f.id === id ? {...f, altText: text} : f))
     }
 
     const handleSaveCrop = (croppedUrl: string) => {
         if (!cropTarget) return
-        setFiles(
-            files.map(f => f.id === cropTarget.id ? {...f, url: croppedUrl} : f)
+        setFiles(prev =>
+            prev.map(f => f.id === cropTarget.id ? {...f, url: croppedUrl} : f)
         )
         setCropTarget(null)
     }
@@ -167,12 +181,13 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
                     ))}
                 </div>
                 <input ref={inputRef} type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx" id="uploadedImage" className="hidden"
-                       onChange={ async (e) => {
+                       onChange={(e) => {
                            e.preventDefault();
-                           setFile(e.target.files?.[0])
-                           addFiles(Array.from(e.target.files ?? []))
-                       }
-                       }/>
+                           if (e.target.files && e.target.files.length > 0) {
+                               addFiles(Array.from(e.target.files));
+                           }
+                           e.target.value = "";
+                       }}/>
             </div>
 
             {/* Thumbnails */}
@@ -196,34 +211,44 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
                                 </div>
                             )}
 
+                            {/* Loading overlay during S3 upload */}
+                            {f.isUploading && (
+                                <div className="absolute inset-0 bg-background/70 backdrop-blur-[1px] flex flex-col items-center justify-center gap-1 z-10">
+                                    <Loader2 size={20} className="text-primary animate-spin" />
+                                    <span className="text-[10px] font-medium text-muted-foreground">Uploading…</span>
+                                </div>
+                            )}
+
                             {/* Hover overlay */}
-                            <div
-                                className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 rounded-xl">
-                                <button onClick={() => setAltTarget(altTarget === f.id ? null : f.id)}
-                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
-                                        title="Alt text">
-                                    <Type size={12}/>
-                                </button>
-                                {f.type === "image" && (
-                                    <button
-                                        onClick={() => setCropTarget(f)}
-                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
-                                        title="Crop Image"
-                                    >
-                                        <Crop size={12}/>
+                            {!f.isUploading && (
+                                <div
+                                    className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 rounded-xl z-20">
+                                    <button onClick={() => setAltTarget(altTarget === f.id ? null : f.id)}
+                                            className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+                                            title="Alt text">
+                                        <Type size={12}/>
                                     </button>
-                                )}
-                                <button
-                                    className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
-                                    title="Replace">
-                                    <RotateCcw size={12}/>
-                                </button>
-                                <button onClick={() => remove(f.id)}
-                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 text-destructive transition-colors"
-                                        title="Delete">
-                                    <X size={12}/>
-                                </button>
-                            </div>
+                                    {f.type === "image" && (
+                                        <button
+                                            onClick={() => setCropTarget(f)}
+                                            className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+                                            title="Crop Image"
+                                        >
+                                            <Crop size={12}/>
+                                        </button>
+                                    )}
+                                    <button
+                                        className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-muted transition-colors"
+                                        title="Replace">
+                                        <RotateCcw size={12}/>
+                                    </button>
+                                    <button onClick={() => remove(f.id)}
+                                            className="w-7 h-7 bg-card rounded-lg flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 text-destructive transition-colors"
+                                            title="Delete">
+                                        <X size={12}/>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -259,3 +284,4 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
         </div>
     )
 }
+

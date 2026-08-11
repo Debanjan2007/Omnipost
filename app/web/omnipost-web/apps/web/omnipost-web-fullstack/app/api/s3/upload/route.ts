@@ -15,7 +15,13 @@ export async function POST(req: NextRequest) {
         const file = data.get('file') as File;
         const fileBuffer = await file.arrayBuffer();
         if (!fileTypes.includes(file.type)) {
-            return Error("File type not supported")
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "File type not supported"
+                },
+                {status: 400}
+            )
         }
         const key = UniqueKey(file.name)
         const object = await putObject(process.env.S3_BUCKET_NAME as string, key, fileBuffer)
