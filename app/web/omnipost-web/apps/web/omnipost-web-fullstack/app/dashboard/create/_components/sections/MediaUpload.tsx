@@ -57,7 +57,7 @@ export function MediaUpload({files, setFiles}: MediaUploadProps) {
             .then(async (res) => {
                 const data = await res.json().catch(() => null);
                 if (!res.ok || !data?.success) {
-                    throw new Error(data?.message || "Failed to upload file");
+                    return Error(data?.message || "Failed to upload file");
                 }
 
                 console.log("Upload response:", data);
