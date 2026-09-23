@@ -58,7 +58,7 @@ export function ConnectedAccountsPage({initialAccounts}: ConnectedAccountsPagePr
         )
         if (provider) {
             if (provider.enabled && provider.oauthPath) {
-                router.push(provider.oauthPath)
+                window.location.href = provider.oauthPath
             } else {
                 toast.error("This provider is not available yet.")
             }
@@ -67,33 +67,20 @@ export function ConnectedAccountsPage({initialAccounts}: ConnectedAccountsPagePr
     }
 
     const handleReconnect = (accountId: string) => {
-        setAccounts(prev => prev.map(acc => {
-            if (acc.id !== accountId) return acc
-            return {
-                ...acc,
-                connectedStatus: "connected",
-                healthStatus: "excellent",
-                lastSync: "Just now",
-                tokenExpiry: "60 days remaining",
-                webhookStatus: "active",
-                syncLogs: [
-                    {time: "Just now", event: "Token reauthorization successful", status: "success"},
-                    ...acc.syncLogs,
-                ],
-            }
-        }))
-        // Keep the drawer open and updated if the reconnected account is selected
-        setSelectedAccount(prev => {
-            if (!prev || prev.id !== accountId) return prev
-            return {
-                ...prev,
-                connectedStatus: "connected",
-                healthStatus: "excellent",
-                lastSync: "Just now",
-                tokenExpiry: "60 days remaining",
-                webhookStatus: "active",
-            }
-        })
+        const targetAccount = accounts.find(acc => acc.id === accountId)
+        const platformName = targetAccount?.platform.toLowerCase() ?? ""
+
+        const provider = Object.values(PROVIDERS_CONFIG).find(
+            p => p.name.toLowerCase() === platformName || p.key.toLowerCase() === platformName
+        )
+
+        if (provider && provider.enabled && provider.oauthPath) {
+            window.location.href = provider.oauthPath
+        } else if (platformName === "linkedin") {
+            window.location.href = "/dashboard/oauth/linkedin"
+        } else {
+            toast.error(`Re-authentication for ${targetAccount?.platform || "this provider"} is not available yet.`)
+        }
     }
 
     const handleDisconnect = async (accountId: string) => {
@@ -266,7 +253,7 @@ export function ConnectedAccountsPage({initialAccounts}: ConnectedAccountsPagePr
                             onDisconnect={handleDisconnect}
                             onConnectPlatform={(oauthPath) => {
                                 if (oauthPath) {
-                                    router.push(oauthPath)
+                                    window.location.href = oauthPath
                                 } else {
                                     toast.error("This provider is not available yet.")
                                 }

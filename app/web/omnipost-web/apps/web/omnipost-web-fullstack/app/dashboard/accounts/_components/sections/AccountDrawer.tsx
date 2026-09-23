@@ -148,17 +148,20 @@ function OverviewTab({ account, onReconnect }: { account: Account; onReconnect: 
                 </div>
             </div>
 
-            {/* Reconnect CTA if unhealthy */}
-            {isWarning && (
-                <button
-                    type="button"
-                    onClick={() => onReconnect(account.id)}
-                    className="w-full h-9 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-xs font-semibold flex items-center justify-center gap-2 transition-all"
-                >
-                    <RefreshCcw size={12} />
-                    Reauthorize Connection
-                </button>
-            )}
+            {/* Reconnect / Reauthorize CTA */}
+            <button
+                type="button"
+                onClick={() => onReconnect(account.id)}
+                className={cn(
+                    "w-full h-9 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer",
+                    isWarning
+                        ? "bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500"
+                        : "bg-muted/40 hover:bg-muted border border-border/60 text-foreground"
+                )}
+            >
+                <RefreshCcw size={12} />
+                Reauthorize Connection
+            </button>
         </div>
     )
 }

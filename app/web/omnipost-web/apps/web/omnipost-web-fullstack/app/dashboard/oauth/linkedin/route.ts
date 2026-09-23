@@ -16,10 +16,7 @@ const linkedin = auth.getProvider("Linkedin")
  */
 export function GET(request: Request) {
     try {
-        console.log("getting linkedin oauth url linkedin: ", linkedin)
         const authorizationUrl = linkedin.getAuthorizationUrl()
-        console.log("oauth url is: ", authorizationUrl)
-
         if (!authorizationUrl) {
             console.log("Authorization URL not found")
             return NextResponse.redirect(
